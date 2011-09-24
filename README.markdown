@@ -1,3 +1,21 @@
+jQuery Tabs
+===========
+
+Tabs, that are printable and usable with [bootstrap](https://github.com/twitter/bootstrap).
+
+Methods
+-------
+
+
+* `jqTabs::seek(index)` - seeks to a tab, index 0-based
+* `jqTabs::next()` - go to next tab
+* `jqTabs::previous()` - go to previous tab
+
+
+
+Barebone example
+----------------
+
 ```html
 <div id="the_id">
 	<ul class="tab-headers">
