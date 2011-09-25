@@ -2,12 +2,6 @@
 	<head>
 	</head>
 	<body>
-		<ul>
-			<li><a href="examples/barebone.html">Barebone Example</a></li>
-			<li><a href="examples/zepto.html">Zepto Example</a></li>
-			<li><a href="examples/bootstrap.html">Bootstrap</a></li>
-			<li><a href="examples/history.html">History support</a></li>
-		</ul>
 		<div id="content">
 			<div id="tabbed">
 				<ul class="tab-headers tabs">
@@ -29,47 +23,27 @@
 			</div>
 			<button class="btn" id="previous">Previous</button>
 			<button class="btn" id="next">Next</button>
+			
 		</div>
 		<style>
-			#content
-			{
-				margin: 20px;
-			}
-
 			.hidden
 			{
 				display: none;
 			}
-
 			.activeTab
 			{
 				color: blue;
 			}
 		</style>
-		<style media="print">
-			.hidden
-			{
-				display: block;
-			}
-			.tabs
-			{
-				display: none;
-			}
-			.btn
-			{
-				display: none;
-			}
-			.tabcontent
-			{
-				margin-bottom: 20px;
-			}
-		</style>
-		<script src="thirdparty/js/jquery-1.6.4.min.js"></script>
-		<script src="jqTabs.js"></script>
+		<script src="../thirdparty/js/jquery-1.6.4.min.js"></script>
+		<script src="../thirdparty/js/signals.min.js"></script>
+		<script src="../thirdparty/js/hasher.min.js"></script>
+		<script src="../jqTabs.js"></script>
 		<script>
 			$(document).ready(
 				function()
 				{
+
 					var tabs = new jqTabs($("#tabbed"));
 
 					$('#next').click(function()

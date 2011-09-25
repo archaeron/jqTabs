@@ -11,7 +11,10 @@ Methods
 * `jqTabs::next()` - go to next tab
 * `jqTabs::previous()` - go to previous tab
 
+Options
+-------
 
+* `activeClass` - class to be added to the active Tab (use 'active' for bootstrap)
 
 Barebone example
 ----------------
@@ -41,4 +44,11 @@ Barebone example
 
 ```javascript
 var tabs = new jqTabs($("#the_id"));
+```
+
+```css
+.hidden
+{
+	display: none;
+}
 ```
