@@ -1,11 +1,13 @@
-jQuery Tabs
+Tabs
 ===========
 
-Tabs, that are printable and usable with [bootstrap](https://github.com/twitter/bootstrap).
+* Usable with jQuery or Zepto
+* Support for history
+* usable with [bootstrap](https://github.com/twitter/bootstrap)
+* printable
 
 Methods
 -------
-
 
 * `jqTabs::seek(index)` - seeks to a tab, index 0-based
 * `jqTabs::next()` - go to next tab
@@ -15,7 +17,7 @@ Options
 -------
 
 * `activeClass` - class to be added to the active Tab (use `'active' for bootstrap), default: `'activeTab'`
-* `useHistory` - use the history, needs hasher and js-signals, default: `true`, if hasher isn't included it is set to false` regardless of what was set in the options
+* `useHistory` - use the history, needs hasher and js-signals, default: `true`, if hasher isn't included it is set to `false` regardless of what was set in the options
 
 Dependencies
 ------------
@@ -23,8 +25,8 @@ Dependencies
 * [jQuery](http://jquery.com/) or [Zepto](http://zeptojs.com/)
 * [hasher](http://github.com/millermedeiros/hasher) (and therefore [js-signals](http://millermedeiros.github.com/js-signals/)) for history support
 
-Barebone example
-----------------
+Simple example
+--------------
 
 ```html
 <div id="the_id">
