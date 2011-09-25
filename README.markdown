@@ -14,7 +14,14 @@ Methods
 Options
 -------
 
-* `activeClass` - class to be added to the active Tab (use 'active' for bootstrap)
+* `activeClass` - class to be added to the active Tab (use 'active' for bootstrap), default: `'activeTab'`
+* `useHistory` - use the history, needs hasher and js-signals, default: `true`, if hasher isn't included it is set to false` regardless of what was set in the options
+
+Dependencies
+------------
+
+* [jQuery](http://jquery.com/) or [Zepto](http://zeptojs.com/)
+* [hasher](http://github.com/millermedeiros/hasher) and [js-signals](http://millermedeiros.github.com/js-signals/) for history support
 
 Barebone example
 ----------------
