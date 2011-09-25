@@ -42,3 +42,10 @@ Barebone example
 ```javascript
 var tabs = new jqTabs($("#the_id"));
 ```
+
+```css
+.hidden
+{
+	display: none;
+}
+```
