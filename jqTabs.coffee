@@ -2,20 +2,30 @@
 
 class jqTabs
 	activeTab = 0
+	#default settings
 	settings =
-		contentSelector: "tabcontent"
 		activeClass: 'activeTab'
 
+	#initial Setup
+	#-------------
 	constructor: ($tabsContainer, options) ->
+		#reference to seek, so that we can use it later
 		seek = @seek
 
+		#extending the options with a jquery function
 		$.extend settings, options
-		tabcontentSelector = "." + settings.contentSelector
-		@$tabs = $("ul.tab-headers li", $tabsContainer)
-		@$tabContent = $(tabcontentSelector, $tabsContainer)
+
+		#creating a jQuery object for the tabHeaders, tabContents
+		@$tabs = $('ul.tab-headers li', $tabsContainer)
+		@$tabContent = $('> div > div', $tabsContainer)
+		#saving the number of tabs
 		@numTabs = @$tabContent.length
+
+		#giving the fist tab the 'activeClass' (it is possible to change the name of this class by #passing an optional settings object as the second parameter to the constructor)
 		$(@$tabs[0]).addClass settings.activeClass
+		#hide all tabs
 		@$tabContent.addClass "hidden"
+		#and show only the first
 		$(@$tabContent[0]).removeClass "hidden"
 
 		@$tabs.each (index) ->
