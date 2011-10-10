@@ -94,7 +94,7 @@ class jqTabs
 		
 	seek : (whereTo) =>
 		#only proceed, if the tab you want to seek to exists
-		if not (0 <= whereTo < @numTabs)
+		if 0 > whereTo >= @numTabs
 			return
 
 		if settings.useHistory

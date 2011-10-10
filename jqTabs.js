@@ -83,7 +83,7 @@
     };
     jqTabs.prototype.seek = function(whereTo) {
       var $currentTab, go_on, hash;
-      if (!((0 <= whereTo && whereTo < this.numTabs))) {
+      if ((0 > whereTo && whereTo >= this.numTabs)) {
         return;
       }
       if (settings.useHistory) {
