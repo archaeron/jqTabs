@@ -105,8 +105,8 @@ class jqTabs
 		go_on = true
 		if callbacksBefore[whereTo]?
 			go_on = callbacksBefore[whereTo]()
-		
-		if go_on
+
+		if go_on isnt false
 			@changeTab whereTo
 			if callbacksAfter[whereTo]?
 				callbacksAfter[whereTo]()

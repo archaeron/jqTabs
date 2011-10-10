@@ -44,6 +44,14 @@
 					var tabs = new jqTabs($("#tabbed"));
 					tabs.on(1, 'before', function(){ alert('loading Tab 2');});
 					tabs.on(1, 'after', function(){ alert('Tab 2 loaded');});
+					
+					tabs.on(2, 'before',
+						function()
+						{
+							alert('3rd tab will not load');
+							return false;
+						}
+					);
 
 					$('#next').click(function()
 					{

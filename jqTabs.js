@@ -95,7 +95,7 @@
       if (callbacksBefore[whereTo] != null) {
         go_on = callbacksBefore[whereTo]();
       }
-      if (go_on) {
+      if (go_on !== false) {
         this.changeTab(whereTo);
         if (callbacksAfter[whereTo] != null) {
           callbacksAfter[whereTo]();
