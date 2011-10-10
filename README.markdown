@@ -14,7 +14,7 @@ Methods
 * `jqTabs::previous()` - go to previous tab
 * `jqTabs::on(index, position, callback)` - add a callback to a tab.
 	* `index` : index of the tab you want to add the callback to
-	* `position` : `'before'` or `'after'`, the sets if the callback function should be called before or after the tab has been displayed
+	* `position` : `'before'` or `'after'`, sets if the callback function should be called before or after the tab has been displayed
 	* `callback` : the callback function, if a `'before'` callback returns false, the tab won't change
 
 Options
