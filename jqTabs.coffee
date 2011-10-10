@@ -2,7 +2,7 @@ class jqTabs
 	activeTab = 0
 	#default settings
 	settings =
-		activeClass: 'activeTab'
+		activeClass: 'active'
 		useHistory: true
 		hiddenClass: 'hidden'
 		tabsClickable: true

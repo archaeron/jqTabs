@@ -5,7 +5,7 @@
     var activeTab, callbacksAfter, callbacksBefore, settings;
     activeTab = 0;
     settings = {
-      activeClass: 'activeTab',
+      activeClass: 'active',
       useHistory: true,
       hiddenClass: 'hidden',
       tabsClickable: true

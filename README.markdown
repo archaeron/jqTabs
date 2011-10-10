@@ -12,12 +12,18 @@ Methods
 * `jqTabs::seek(index)` - seeks to a tab, index 0-based
 * `jqTabs::next()` - go to next tab
 * `jqTabs::previous()` - go to previous tab
+* `jqTabs::on(index, position, callback)` - add a callback to a tab.
+	* `index` : index of the tab you want to add the callback to
+	* `position` : `'before'` or `'after'`, the sets if the callback function should be called before or after the tab has been displayed
+	* `callback` : the callback function, if a `'before'` callback returns false, the tab won't change
 
 Options
 -------
 
-* `activeClass` - class to be added to the active Tab (use `'active' for bootstrap), default: `'activeTab'`
+* `activeClass` - class to be added to the active Tab, default: `'active'`
+* `hiddenClass` - class to be added to a hidden tab
 * `useHistory` - use the history, needs hasher and js-signals, default: `true`, if hasher isn't included it is set to `false` regardless of what was set in the options
+* `tabsClickable` - set to `false`, if you don't want the tabs in the tabbar to be clickable
 
 Dependencies
 ------------
