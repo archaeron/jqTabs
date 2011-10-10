@@ -1,11 +1,14 @@
-"use strict"
-
 class jqTabs
 	activeTab = 0
 	#default settings
 	settings =
 		activeClass: 'activeTab'
 		useHistory: true
+		hiddenClass: 'hidden'
+		tabsClickable: true
+		
+	callbacksBefore = {}
+	callbacksAfter = {}
 
 	#initial Setup
 	#-------------
@@ -13,11 +16,14 @@ class jqTabs
 		#reference to seek, so that we can use it later
 		seek = @seek
 
-		if settings.useHistory and not hasher?
-			settings.useHistory = false
-
 		#extending the options with a jquery function
 		$.extend settings, options
+		
+		if settings.useHistory and not hasher?
+			settings.useHistory = false
+			
+		if not settings.tabsClickable$
+			settings.useHistory = false
 
 		#creating a jQuery object for the tabHeaders, tabContents
 		@$tabs = $('ul.tab-headers li', $tabsContainer)
@@ -28,19 +34,24 @@ class jqTabs
 		#giving the fist tab the 'activeClass' (it is possible to change the name of this class by #passing an optional settings object as the second parameter to the constructor)
 		$(@$tabs[0]).addClass settings.activeClass
 		#hide all tabs
-		@$tabContent.addClass "hidden"
+		@$tabContent.addClass settings.hiddenClass
 		#and show only the first
-		$(@$tabContent[0]).removeClass "hidden"
+		$(@$tabContent[0]).removeClass settings.hiddenClass
 
 		@$tabs.each (index) ->
-			$(this).attr "data-tabnr", index
+			tab = $(this)
+			tab.attr "data-tabnr", index
+			if not settings.tabsClickable
+				tab.children('a').css 'cursor', 'default'
 
 		@$tabs.click (e) ->
-			e.preventDefault()
-			$goToTab = $ this
-			unless $goToTab.hasClass settings.activeClass
-				toTab = parseInt($goToTab.attr("data-tabnr"), 10)
-				seek toTab
+			if not settings.tabsClickable
+				e.preventDefault()
+			else
+				$goToTab = $ this
+				unless $goToTab.hasClass settings.activeClass
+					toTab = parseInt($goToTab.attr("data-tabnr"), 10)
+					seek toTab
 
 		if settings.useHistory
 
@@ -77,8 +88,8 @@ class jqTabs
 		#and ad it only to the current tab
 		$currentTab.addClass settings.activeClass
 
-		@$tabContent.addClass "hidden"
-		$(@$tabContent[whereTo]).removeClass "hidden"
+		@$tabContent.addClass settings.hiddenClass
+		$(@$tabContent[whereTo]).removeClass settings.hiddenClass
 			
 		
 	seek : (whereTo) =>
@@ -91,7 +102,14 @@ class jqTabs
 			hash = $currentTab.find('a').attr('href').replace(/\#/, '')
 			hasher.setHash hash
 
-		@changeTab whereTo
+		go_on = true
+		if callbacksBefore[whereTo]?
+			go_on = callbacksBefore[whereTo]()
+		
+		if go_on
+			@changeTab whereTo
+			if callbacksAfter[whereTo]?
+				callbacksAfter[whereTo]()
 		
 		return
 	
@@ -102,5 +120,13 @@ class jqTabs
 	previous : ->
 		@seek (activeTab - 1)
 		return
+		
+	on : (index, position, callback) ->
+		switch position
+			when 'before'
+				callbacksBefore[index] = callback
+			when 'after'
+				callbacksAfter[index] = callback
+		
 
 window.jqTabs = jqTabs

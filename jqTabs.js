@@ -1,39 +1,53 @@
 (function() {
-  "use strict";
   var jqTabs;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   jqTabs = (function() {
-    var activeTab, settings;
+    var activeTab, callbacksAfter, callbacksBefore, settings;
     activeTab = 0;
     settings = {
       activeClass: 'activeTab',
-      useHistory: true
+      useHistory: true,
+      hiddenClass: 'hidden',
+      tabsClickable: true
     };
+    callbacksBefore = {};
+    callbacksAfter = {};
     function jqTabs($tabsContainer, options) {
       this.seek = __bind(this.seek, this);
       this.changeTab = __bind(this.changeTab, this);
       var historyChangeTab, seek;
       seek = this.seek;
+      $.extend(settings, options);
       if (settings.useHistory && !(typeof hasher !== "undefined" && hasher !== null)) {
         settings.useHistory = false;
       }
-      $.extend(settings, options);
+      if (!settings.tabsClickable$) {
+        settings.useHistory = false;
+      }
       this.$tabs = $('ul.tab-headers li', $tabsContainer);
       this.$tabContent = $tabsContainer.children('div').children('div');
       this.numTabs = this.$tabContent.length;
       $(this.$tabs[0]).addClass(settings.activeClass);
-      this.$tabContent.addClass("hidden");
-      $(this.$tabContent[0]).removeClass("hidden");
+      this.$tabContent.addClass(settings.hiddenClass);
+      $(this.$tabContent[0]).removeClass(settings.hiddenClass);
       this.$tabs.each(function(index) {
-        return $(this).attr("data-tabnr", index);
+        var tab;
+        tab = $(this);
+        tab.attr("data-tabnr", index);
+        if (!settings.tabsClickable) {
+          return tab.children('a').css('cursor', 'default');
+        }
       });
       this.$tabs.click(function(e) {
         var $goToTab, toTab;
-        e.preventDefault();
-        $goToTab = $(this);
-        if (!$goToTab.hasClass(settings.activeClass)) {
-          toTab = parseInt($goToTab.attr("data-tabnr"), 10);
-          return seek(toTab);
+        if (!settings.tabsClickable) {
+          return e.preventDefault();
+        } else {
+          $goToTab = $(this);
+          if (!$goToTab.hasClass(settings.activeClass)) {
+            toTab = parseInt($goToTab.attr("data-tabnr"), 10);
+            return seek(toTab);
+          }
         }
       });
       if (settings.useHistory) {
@@ -64,11 +78,11 @@
       activeTab = whereTo;
       this.$tabs.removeClass(settings.activeClass);
       $currentTab.addClass(settings.activeClass);
-      this.$tabContent.addClass("hidden");
-      return $(this.$tabContent[whereTo]).removeClass("hidden");
+      this.$tabContent.addClass(settings.hiddenClass);
+      return $(this.$tabContent[whereTo]).removeClass(settings.hiddenClass);
     };
     jqTabs.prototype.seek = function(whereTo) {
-      var $currentTab, hash;
+      var $currentTab, go_on, hash;
       if (!((0 <= whereTo && whereTo < this.numTabs))) {
         return;
       }
@@ -77,13 +91,30 @@
         hash = $currentTab.find('a').attr('href').replace(/\#/, '');
         hasher.setHash(hash);
       }
-      this.changeTab(whereTo);
+      go_on = true;
+      if (callbacksBefore[whereTo] != null) {
+        go_on = callbacksBefore[whereTo]();
+      }
+      if (go_on) {
+        this.changeTab(whereTo);
+        if (callbacksAfter[whereTo] != null) {
+          callbacksAfter[whereTo]();
+        }
+      }
     };
     jqTabs.prototype.next = function() {
       this.seek(activeTab + 1);
     };
     jqTabs.prototype.previous = function() {
       this.seek(activeTab - 1);
+    };
+    jqTabs.prototype.on = function(index, position, callback) {
+      switch (position) {
+        case 'before':
+          return callbacksBefore[index] = callback;
+        case 'after':
+          return callbacksAfter[index] = callback;
+      }
     };
     return jqTabs;
   })();
