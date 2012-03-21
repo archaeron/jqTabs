@@ -28,7 +28,7 @@ Options
 Dependencies
 ------------
 
-* [jQuery](http://jquery.com/) or [Zepto](http://zeptojs.com/)
+* [jQuery (1.7)](http://jquery.com/) or [Zepto (0.8)](http://zeptojs.com/)
 * [hasher](http://github.com/millermedeiros/hasher) (and therefore [js-signals](http://millermedeiros.github.com/js-signals/)) for history support
 
 Simple example
