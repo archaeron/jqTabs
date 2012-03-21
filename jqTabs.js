@@ -1,29 +1,32 @@
 (function() {
-  var jqTabs;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var jqTabs,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   jqTabs = (function() {
-    var activeTab, callbacksAfter, callbacksBefore, settings;
+    var activeTab, settings;
+
     activeTab = 0;
+
     settings = {
       activeClass: 'active',
       useHistory: true,
       hiddenClass: 'hidden',
-      tabsClickable: true
+      tabsClickable: true,
+      callbacksBefore: {},
+      callbacksAfter: {}
     };
-    callbacksBefore = {};
-    callbacksAfter = {};
+
     function jqTabs($tabsContainer, options) {
       this.seek = __bind(this.seek, this);
       this.changeTab = __bind(this.changeTab, this);
-      var historyChangeTab, seek;
+      var historyChangeTab, seek,
+        _this = this;
       seek = this.seek;
       $.extend(settings, options);
       if (settings.useHistory && !(typeof hasher !== "undefined" && hasher !== null)) {
         settings.useHistory = false;
       }
-      if (!settings.tabsClickable$) {
-        settings.useHistory = false;
-      }
+      if (!settings.tabsClickable) settings.useHistory = false;
       this.$tabs = $('ul.tab-headers li', $tabsContainer);
       this.$tabContent = $tabsContainer.children('div').children('div');
       this.numTabs = this.$tabContent.length;
@@ -40,9 +43,8 @@
       });
       this.$tabs.click(function(e) {
         var $goToTab, toTab;
-        if (!settings.tabsClickable) {
-          return e.preventDefault();
-        } else {
+        e.preventDefault();
+        if (settings.tabsClickable) {
           $goToTab = $(this);
           if (!$goToTab.hasClass(settings.activeClass)) {
             toTab = parseInt($goToTab.attr("data-tabnr"), 10);
@@ -51,10 +53,10 @@
         }
       });
       if (settings.useHistory) {
-        historyChangeTab = __bind(function(newHash) {
+        historyChangeTab = function(newHash) {
           var changeTo;
           changeTo = -1;
-          this.$tabs.each(function(index, elem) {
+          _this.$tabs.each(function(index, elem) {
             var href;
             href = $(elem).children('a').attr('href');
             href = href.replace(/\#/, '');
@@ -63,15 +65,14 @@
               return false;
             }
           });
-          if (changeTo !== -1) {
-            return this.changeTab(changeTo);
-          }
-        }, this);
+          if (changeTo !== -1) return _this.seek(changeTo);
+        };
         hasher.initialized.add(historyChangeTab);
         hasher.changed.add(historyChangeTab);
         hasher.init();
       }
     }
+
     jqTabs.prototype.changeTab = function(whereTo) {
       var $currentTab;
       $currentTab = $(this.$tabs[whereTo]);
@@ -81,42 +82,48 @@
       this.$tabContent.addClass(settings.hiddenClass);
       return $(this.$tabContent[whereTo]).removeClass(settings.hiddenClass);
     };
+
     jqTabs.prototype.seek = function(whereTo) {
       var $currentTab, go_on, hash;
-      if ((0 > whereTo && whereTo >= this.numTabs)) {
-        return;
-      }
-      if (settings.useHistory) {
-        $currentTab = $(this.$tabs[whereTo]);
-        hash = $currentTab.find('a').attr('href').replace(/\#/, '');
-        hasher.setHash(hash);
-      }
+      if (0 > whereTo || whereTo >= this.numTabs) return;
       go_on = true;
-      if (callbacksBefore[whereTo] != null) {
-        go_on = callbacksBefore[whereTo]();
+      if (settings.callbacksBefore[whereTo] != null) {
+        go_on = settings.callbacksBefore[whereTo]();
       }
       if (go_on !== false) {
+        if (settings.useHistory) {
+          $currentTab = $(this.$tabs[whereTo]);
+          hash = $currentTab.find('a').attr('href').replace(/\#/, '');
+          hasher.setHash(hash);
+        }
         this.changeTab(whereTo);
-        if (callbacksAfter[whereTo] != null) {
-          callbacksAfter[whereTo]();
+        if (settings.callbacksAfter[whereTo] != null) {
+          settings.callbacksAfter[whereTo]();
         }
       }
     };
+
     jqTabs.prototype.next = function() {
       this.seek(activeTab + 1);
     };
+
     jqTabs.prototype.previous = function() {
       this.seek(activeTab - 1);
     };
+
     jqTabs.prototype.on = function(index, position, callback) {
       switch (position) {
         case 'before':
-          return callbacksBefore[index] = callback;
+          return settings.callbacksBefore[index] = callback;
         case 'after':
-          return callbacksAfter[index] = callback;
+          return settings.callbacksAfter[index] = callback;
       }
     };
+
     return jqTabs;
+
   })();
+
   window.jqTabs = jqTabs;
+
 }).call(this);

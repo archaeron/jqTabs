@@ -6,9 +6,8 @@ class jqTabs
 		useHistory: true
 		hiddenClass: 'hidden'
 		tabsClickable: true
-		
-	callbacksBefore = {}
-	callbacksAfter = {}
+		callbacksBefore: {}
+		callbacksAfter: {}
 
 	#initial Setup
 	#-------------
@@ -18,14 +17,14 @@ class jqTabs
 
 		#extending the options with a jquery function
 		$.extend settings, options
-		
+		# if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
 		if settings.useHistory and not hasher?
 			settings.useHistory = false
 			
-		if not settings.tabsClickable$
+		if not settings.tabsClickable
 			settings.useHistory = false
 
-		#creating a jQuery object for the tabHeaders, tabContents
+		#creating a `jQuery` object for the tabHeaders, tabContents
 		@$tabs = $('ul.tab-headers li', $tabsContainer)
 		@$tabContent = $tabsContainer.children('div').children('div')
 		#saving the number of tabs
@@ -45,9 +44,8 @@ class jqTabs
 				tab.children('a').css 'cursor', 'default'
 
 		@$tabs.click (e) ->
-			if not settings.tabsClickable
-				e.preventDefault()
-			else
+			e.preventDefault()
+			if settings.tabsClickable
 				$goToTab = $ this
 				unless $goToTab.hasClass settings.activeClass
 					toTab = parseInt($goToTab.attr("data-tabnr"), 10)
@@ -67,7 +65,7 @@ class jqTabs
 						return false
 				
 				if changeTo isnt -1
-					@changeTab changeTo
+					@seek changeTo
 
 			hasher.initialized.add historyChangeTab
 
@@ -94,23 +92,22 @@ class jqTabs
 		
 	seek : (whereTo) =>
 		#only proceed, if the tab you want to seek to exists
-		if 0 > whereTo >= @numTabs
+		if 0 > whereTo or whereTo >= @numTabs
 			return
 
-		if settings.useHistory
-			$currentTab = $(@$tabs[whereTo])
-			hash = $currentTab.find('a').attr('href').replace(/\#/, '')
-			hasher.setHash hash
-
 		go_on = true
-		if callbacksBefore[whereTo]?
-			go_on = callbacksBefore[whereTo]()
+		if settings.callbacksBefore[whereTo]?
+			go_on = settings.callbacksBefore[whereTo]()
 
 		if go_on isnt false
+			if settings.useHistory
+				$currentTab = $(@$tabs[whereTo])
+				hash = $currentTab.find('a').attr('href').replace(/\#/, '')
+				hasher.setHash hash
+			
 			@changeTab whereTo
-			if callbacksAfter[whereTo]?
-				callbacksAfter[whereTo]()
-		
+			if settings.callbacksAfter[whereTo]?
+				settings.callbacksAfter[whereTo]()
 		return
 	
 	next : ->
@@ -124,9 +121,9 @@ class jqTabs
 	on : (index, position, callback) ->
 		switch position
 			when 'before'
-				callbacksBefore[index] = callback
+				settings.callbacksBefore[index] = callback
 			when 'after'
-				callbacksAfter[index] = callback
+				settings.callbacksAfter[index] = callback
 		
 
 window.jqTabs = jqTabs
