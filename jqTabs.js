@@ -3,11 +3,12 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   jqTabs = (function() {
-    var activeTab, settings;
 
-    activeTab = 0;
+    jqTabs.VERSION = "0.4";
 
-    settings = {
+    jqTabs.prototype.activeTab = 0;
+
+    jqTabs.prototype.settings = {
       activeClass: 'active',
       useHistory: true,
       hiddenClass: 'hidden',
@@ -17,42 +18,35 @@
     };
 
     function jqTabs($tabsContainer, options) {
+      var historyChangeTab, self,
+        _this = this;
+      this.$tabsContainer = $tabsContainer;
+      this.makeContent = __bind(this.makeContent, this);
       this.seek = __bind(this.seek, this);
       this.changeTab = __bind(this.changeTab, this);
-      var historyChangeTab, seek,
-        _this = this;
-      seek = this.seek;
-      $.extend(settings, options);
-      if (settings.useHistory && !(typeof hasher !== "undefined" && hasher !== null)) {
-        settings.useHistory = false;
+      self = this;
+      $.extend(this.settings, options);
+      if (this.settings.useHistory && !(typeof hasher !== "undefined" && hasher !== null)) {
+        this.settings.useHistory = false;
       }
-      if (!settings.tabsClickable) settings.useHistory = false;
-      this.$tabs = $('ul.tab-headers li', $tabsContainer);
-      this.$tabContent = $tabsContainer.children('div').children('div');
+      if (!this.settings.tabsClickable) this.settings.useHistory = false;
+      this.updateElements();
       this.numTabs = this.$tabContent.length;
-      $(this.$tabs[0]).addClass(settings.activeClass);
-      this.$tabContent.addClass(settings.hiddenClass);
-      $(this.$tabContent[0]).removeClass(settings.hiddenClass);
-      this.$tabs.each(function(index) {
-        var tab;
-        tab = $(this);
-        tab.attr("data-tabnr", index);
-        if (!settings.tabsClickable) {
-          return tab.children('a').css('cursor', 'default');
-        }
-      });
-      this.$tabs.click(function(e) {
+      $(this.$tabs[0]).addClass(this.settings.activeClass);
+      this.$tabContent.addClass(this.settings.hiddenClass);
+      $(this.$tabContent[0]).removeClass(this.settings.hiddenClass);
+      $('ul.tab-headers', $tabsContainer).on('click', 'li', function(e) {
         var $goToTab, toTab;
         e.preventDefault();
-        if (settings.tabsClickable) {
+        if (self.settings.tabsClickable) {
           $goToTab = $(this);
-          if (!$goToTab.hasClass(settings.activeClass)) {
-            toTab = parseInt($goToTab.attr("data-tabnr"), 10);
-            return seek(toTab);
+          if (!$goToTab.hasClass(self.settings.activeClass)) {
+            toTab = $goToTab.index(this.$tabs);
+            return self.seek(toTab);
           }
         }
       });
-      if (settings.useHistory) {
+      if (this.settings.useHistory) {
         historyChangeTab = function(newHash) {
           var changeTo;
           changeTo = -1;
@@ -76,48 +70,120 @@
     jqTabs.prototype.changeTab = function(whereTo) {
       var $currentTab;
       $currentTab = $(this.$tabs[whereTo]);
-      activeTab = whereTo;
-      this.$tabs.removeClass(settings.activeClass);
-      $currentTab.addClass(settings.activeClass);
-      this.$tabContent.addClass(settings.hiddenClass);
-      return $(this.$tabContent[whereTo]).removeClass(settings.hiddenClass);
+      this.activeTab = whereTo;
+      this.$tabs.removeClass(this.settings.activeClass);
+      $currentTab.addClass(this.settings.activeClass);
+      this.$tabContent.addClass(this.settings.hiddenClass);
+      return $(this.$tabContent[whereTo]).removeClass(this.settings.hiddenClass);
     };
 
     jqTabs.prototype.seek = function(whereTo) {
       var $currentTab, go_on, hash;
       if (0 > whereTo || whereTo >= this.numTabs) return;
       go_on = true;
-      if (settings.callbacksBefore[whereTo] != null) {
-        go_on = settings.callbacksBefore[whereTo]();
+      if (this.settings.callbacksBefore[whereTo] != null) {
+        go_on = this.settings.callbacksBefore[whereTo]();
       }
       if (go_on !== false) {
-        if (settings.useHistory) {
+        if (this.settings.useHistory) {
           $currentTab = $(this.$tabs[whereTo]);
           hash = $currentTab.find('a').attr('href').replace(/\#/, '');
           hasher.setHash(hash);
         }
         this.changeTab(whereTo);
-        if (settings.callbacksAfter[whereTo] != null) {
-          settings.callbacksAfter[whereTo]();
+        if (this.settings.callbacksAfter[whereTo] != null) {
+          this.settings.callbacksAfter[whereTo]();
         }
       }
     };
 
     jqTabs.prototype.next = function() {
-      this.seek(activeTab + 1);
+      this.seek(this.activeTab + 1);
     };
 
     jqTabs.prototype.previous = function() {
-      this.seek(activeTab - 1);
+      this.seek(this.activeTab - 1);
     };
 
     jqTabs.prototype.on = function(index, position, callback) {
       switch (position) {
         case 'before':
-          return settings.callbacksBefore[index] = callback;
+          return this.settings.callbacksBefore[index] = callback;
         case 'after':
-          return settings.callbacksAfter[index] = callback;
+          return this.settings.callbacksAfter[index] = callback;
       }
+    };
+
+    jqTabs.prototype.insertAfter = function(index, tabHeader, tabContent, select) {
+      var $newTabContent, $newTabHeader, $tabContent, $tabHeader;
+      select = select !== void 0 ? select : true;
+      $tabHeader = $(this.$tabs[index]);
+      $newTabHeader = this.makeHeader(tabHeader);
+      $tabHeader.after($newTabHeader);
+      $tabContent = $(this.$tabContent[index]);
+      $newTabContent = this.makeContent(tabContent);
+      $tabContent.after($newTabContent);
+      this.numTabs++;
+      this.updateElements();
+      if (select) this.seek(index + 1);
+      return $newTabContent;
+    };
+
+    jqTabs.prototype.insertBefore = function(index, tabHeader, tabContent, select) {
+      var $newTabContent, $newTabHeader, $tabContent, $tabHeader;
+      select = select !== void 0 ? select : true;
+      $tabHeader = $(this.$tabs[index]);
+      $newTabHeader = this.makeHeader(tabHeader);
+      $tabHeader.before($newTabHeader);
+      $tabContent = $(this.$tabContent[index]);
+      $newTabContent = this.makeContent(tabContent);
+      $tabContent.before($newTabContent);
+      this.numTabs++;
+      this.updateElements();
+      if (select) this.seek(index + 1);
+      return $newTabContent;
+    };
+
+    jqTabs.prototype.addTab = function(tabHeader, tabContent, select) {
+      var $newTabContent, $newTabHeader, headerContainer;
+      if (this.numTabs === 0) {
+        headerContainer = this.$tabsContainer.find('.tab-headers');
+        $newTabHeader = this.makeHeader(tabHeader);
+        $newTabHeader.addClass(this.settings.activeClass);
+        headerContainer.append($newTabHeader);
+        $newTabContent = this.makeContent(tabContent);
+        $newTabContent.removeClass(this.settings.hiddenClass);
+        this.$tabsContainer.append($newTabContent);
+        this.updateElements();
+        this.numTabs++;
+        return $newTabContent;
+      } else {
+        return this.insertAfter(this.numTabs - 1, tabHeader, tabContent, select);
+      }
+    };
+
+    jqTabs.prototype.removeTab = function(index) {
+      $(this.$tabs[index]).remove();
+      $(this.$tabContent[index]).remove();
+      this.numTabs--;
+      return this.updateElements();
+    };
+
+    jqTabs.prototype.removeLast = function() {};
+
+    jqTabs.prototype.updateElements = function() {
+      this.$tabs = $('ul.tab-headers li:not(.ignore-tab)', this.$tabsContainer);
+      return this.$tabContent = this.$tabsContainer.children('div');
+    };
+
+    jqTabs.prototype.makeHeader = function(header) {
+      return $('<li/>').append(header);
+    };
+
+    jqTabs.prototype.makeContent = function(content) {
+      return $('<div/>', {
+        'class': 'tabcontent ' + this.settings.hiddenClass
+      }).append(content);
     };
 
     return jqTabs;

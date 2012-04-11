@@ -1,7 +1,9 @@
 class jqTabs
-	activeTab = 0
+	@VERSION : "0.4"
+
+	activeTab : 0
 	#default settings
-	settings =
+	settings :
 		activeClass: 'active'
 		useHistory: true
 		hiddenClass: 'hidden'
@@ -11,47 +13,41 @@ class jqTabs
 
 	#initial Setup
 	#-------------
-	constructor: ($tabsContainer, options) ->
+	constructor: (@$tabsContainer, options) ->
 		#reference to seek, so that we can use it later
-		seek = @seek
+		self = @
 
 		#extending the options with a jquery function
-		$.extend settings, options
+		$.extend @settings, options
 		# if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
-		if settings.useHistory and not hasher?
-			settings.useHistory = false
+		if @settings.useHistory and not hasher?
+			@settings.useHistory = false
 			
-		if not settings.tabsClickable
-			settings.useHistory = false
+		if not @settings.tabsClickable
+			@settings.useHistory = false
 
 		#creating a `jQuery` object for the tabHeaders, tabContents
-		@$tabs = $('ul.tab-headers li', $tabsContainer)
-		@$tabContent = $tabsContainer.children('div').children('div')
+		@updateElements()
 		#saving the number of tabs
 		@numTabs = @$tabContent.length
 
 		#giving the fist tab the 'activeClass' (it is possible to change the name of this class by #passing an optional settings object as the second parameter to the constructor)
-		$(@$tabs[0]).addClass settings.activeClass
+		$(@$tabs[0]).addClass @settings.activeClass
 		#hide all tabs
-		@$tabContent.addClass settings.hiddenClass
+		@$tabContent.addClass @settings.hiddenClass
 		#and show only the first
-		$(@$tabContent[0]).removeClass settings.hiddenClass
+		$(@$tabContent[0]).removeClass @settings.hiddenClass
 
-		@$tabs.each (index) ->
-			tab = $(this)
-			tab.attr "data-tabnr", index
-			if not settings.tabsClickable
-				tab.children('a').css 'cursor', 'default'
-
-		@$tabs.click (e) ->
+		$('ul.tab-headers', $tabsContainer).on 'click', 'li', (e) ->
 			e.preventDefault()
-			if settings.tabsClickable
+			if self.settings.tabsClickable
 				$goToTab = $ this
-				unless $goToTab.hasClass settings.activeClass
-					toTab = parseInt($goToTab.attr("data-tabnr"), 10)
-					seek toTab
 
-		if settings.useHistory
+				unless $goToTab.hasClass self.settings.activeClass
+					toTab = $goToTab.index @$tabs
+					self.seek toTab
+
+		if @settings.useHistory
 
 			historyChangeTab = (newHash) =>
 
@@ -79,15 +75,15 @@ class jqTabs
 		$currentTab = $(@$tabs[whereTo])
 
 		#set the active tab, to the tab we seek to
-		activeTab = whereTo
+		@activeTab = whereTo
 
 		#remove the `settings.activeClass` from all tabs
-		@$tabs.removeClass settings.activeClass
+		@$tabs.removeClass @settings.activeClass
 		#and ad it only to the current tab
-		$currentTab.addClass settings.activeClass
+		$currentTab.addClass @settings.activeClass
 
-		@$tabContent.addClass settings.hiddenClass
-		$(@$tabContent[whereTo]).removeClass settings.hiddenClass
+		@$tabContent.addClass @settings.hiddenClass
+		$(@$tabContent[whereTo]).removeClass @settings.hiddenClass
 			
 		
 	seek : (whereTo) =>
@@ -96,34 +92,105 @@ class jqTabs
 			return
 
 		go_on = true
-		if settings.callbacksBefore[whereTo]?
-			go_on = settings.callbacksBefore[whereTo]()
+		if @settings.callbacksBefore[whereTo]?
+			go_on = @settings.callbacksBefore[whereTo]()
 
 		if go_on isnt false
-			if settings.useHistory
+			if @settings.useHistory
 				$currentTab = $(@$tabs[whereTo])
 				hash = $currentTab.find('a').attr('href').replace(/\#/, '')
 				hasher.setHash hash
 			
 			@changeTab whereTo
-			if settings.callbacksAfter[whereTo]?
-				settings.callbacksAfter[whereTo]()
+			if @settings.callbacksAfter[whereTo]?
+				@settings.callbacksAfter[whereTo]()
 		return
 	
 	next : ->
-		@seek (activeTab + 1)
+		@seek (@activeTab + 1)
 		return
 
 	previous : ->
-		@seek (activeTab - 1)
+		@seek (@activeTab - 1)
 		return
 		
 	on : (index, position, callback) ->
 		switch position
 			when 'before'
-				settings.callbacksBefore[index] = callback
+				@settings.callbacksBefore[index] = callback
 			when 'after'
-				settings.callbacksAfter[index] = callback
+				@settings.callbacksAfter[index] = callback
+
+	insertAfter: (index, tabHeader, tabContent, select) ->
+		select = if select != undefined then select else true
+
+		$tabHeader = $(@$tabs[index])
+		$newTabHeader = @makeHeader(tabHeader)
+		$tabHeader.after($newTabHeader)
+
+		$tabContent = $(@$tabContent[index])
+		$newTabContent = @makeContent(tabContent)
+		$tabContent.after($newTabContent)
+
+		@numTabs++
+		@updateElements()
+		@seek(index + 1) if select
+
+		$newTabContent
+
+	insertBefore: (index, tabHeader, tabContent, select) ->
+		select = if select != undefined then select else true
+		$tabHeader = $(@$tabs[index])
+		$newTabHeader = @makeHeader tabHeader
+		$tabHeader.before($newTabHeader)
+
+		$tabContent = $(@$tabContent[index])
+		$newTabContent = @makeContent tabContent
+		$tabContent.before($newTabContent)
+
+		@numTabs++
+		@updateElements()
+		@seek(index + 1) if select
+
+		$newTabContent
+
+	addTab: (tabHeader, tabContent, select) ->
+		if @numTabs is 0
+			headerContainer = @$tabsContainer.find('.tab-headers')
+			$newTabHeader = @makeHeader tabHeader
+			$newTabHeader.addClass @settings.activeClass
+			headerContainer.append($newTabHeader)
+			
+			$newTabContent = @makeContent tabContent
+			$newTabContent.removeClass @settings.hiddenClass
+			@$tabsContainer.append $newTabContent
+
+			@updateElements()
+			@numTabs++
+
+			$newTabContent
+		else
+			@insertAfter @numTabs - 1, tabHeader, tabContent, select
+
+	removeTab: (index) ->
+		$(@$tabs[index]).remove()
+		$(@$tabContent[index]).remove()
+
+		@numTabs--
+
+		@updateElements()
+
+	removeLast: () ->
+
+	updateElements: () ->
+		@$tabs = $('ul.tab-headers li:not(.ignore-tab)', @$tabsContainer)
+		@$tabContent = @$tabsContainer.children('div')
+
+	makeHeader: (header) ->
+		$('<li/>').append(header)
+
+	makeContent: (content) =>
+		$('<div/>', { 'class': 'tabcontent ' + @settings.hiddenClass}).append(content)
 		
 
 window.jqTabs = jqTabs
