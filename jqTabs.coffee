@@ -1,5 +1,5 @@
 class jqTabs
-	@VERSION : "0.4"
+	@VERSION : '0.4.2'
 
 	activeTab : 0
 	#default settings
@@ -15,7 +15,6 @@ class jqTabs
 	#-------------
 	constructor: (@$tabsContainer, options) ->
 		#reference to seek, so that we can use it later
-		self = @
 
 		#extending the options with a jquery function
 		$.extend @settings, options
@@ -38,18 +37,19 @@ class jqTabs
 		#and show only the first
 		$(@$tabContent[0]).removeClass @settings.hiddenClass
 
-		$('ul.tab-headers', $tabsContainer).on 'click', 'li', (e) ->
+		$('ul.tab-headers', $tabsContainer).on 'click', 'li', (e) =>
 			e.preventDefault()
-			if self.settings.tabsClickable
-				$goToTab = $ this
+			
+			if @settings.tabsClickable
+			
+				target = $ e.currentTarget
 
-				unless $goToTab.hasClass self.settings.activeClass
-					toTab = $goToTab.index @$tabs
-					self.seek toTab
+				unless target.hasClass @settings.activeClass
+					toTab = @$tabs.index target
+					@seek toTab
 
 		if @settings.useHistory
 			@setHashChange()
-
 
 	changeTab : (whereTo) =>
 		#save reference to current tab
@@ -65,7 +65,6 @@ class jqTabs
 
 		@$tabContent.addClass @settings.hiddenClass
 		$(@$tabContent[whereTo]).removeClass @settings.hiddenClass
-			
 		
 	seek : (whereTo) =>
 		#only proceed, if the tab you want to seek to exists
@@ -80,7 +79,9 @@ class jqTabs
 			if @settings.useHistory
 				$currentTab = $(@$tabs[whereTo])
 				hash = $currentTab.find('a').attr('href').replace(/\#/, '')
+				hasher.changed.active = false
 				hasher.setHash hash
+				hasher.changed.active = true
 			
 			@changeTab whereTo
 			if @settings.callbacksAfter[whereTo]?

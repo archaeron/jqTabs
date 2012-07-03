@@ -34,12 +34,15 @@
 			}
 		</style>
 		<script src="../thirdparty/js/jquery-1.7.1.min.js"></script>
+		<script src="../thirdparty/js/signals.min.js"></script>
+		<script src="../thirdparty/js/hasher.min.js"></script>
 		<script src="../jqTabs.js"></script>
 		<script>
 			$(document).ready(
 				function()
 				{
 					var tabs = new jqTabs($("#tabbed"));
+					
 					tabs.on(1, 'before', function(){ alert('loading Tab 2');});
 					tabs.on(1, 'after', function(){ alert('Tab 2 loaded');});
 					
