@@ -21,8 +21,7 @@
     };
 
     function jqTabs($tabsContainer, options) {
-      var historyChangeTab, self,
-        _this = this;
+      var self;
       this.$tabsContainer = $tabsContainer;
       this.makeContent = __bind(this.makeContent, this);
 
@@ -55,25 +54,7 @@
         }
       });
       if (this.settings.useHistory) {
-        historyChangeTab = function(newHash) {
-          var changeTo;
-          changeTo = -1;
-          _this.$tabs.each(function(index, elem) {
-            var href;
-            href = $(elem).children('a').attr('href');
-            href = href.replace(/\#/, '');
-            if (href === newHash) {
-              changeTo = index;
-              return false;
-            }
-          });
-          if (changeTo !== -1) {
-            return _this.seek(changeTo);
-          }
-        };
-        hasher.initialized.add(historyChangeTab);
-        hasher.changed.add(historyChangeTab);
-        hasher.init();
+        this.setHashChange();
       }
     }
 
@@ -200,6 +181,30 @@
       return $('<div/>', {
         'class': 'tabcontent ' + this.settings.hiddenClass
       }).append(content);
+    };
+
+    jqTabs.prototype.setHashChange = function() {
+      var historyChangeTab,
+        _this = this;
+      historyChangeTab = function(newHash) {
+        var changeTo;
+        changeTo = -1;
+        _this.$tabs.each(function(index, elem) {
+          var href;
+          href = $(elem).children('a').attr('href');
+          href = href.replace(/\#/, '');
+          if (href === newHash) {
+            changeTo = index;
+            return false;
+          }
+        });
+        if (changeTo !== -1) {
+          return _this.seek(changeTo);
+        }
+      };
+      hasher.initialized.add(historyChangeTab);
+      hasher.changed.add(historyChangeTab);
+      return hasher.init();
     };
 
     return jqTabs;

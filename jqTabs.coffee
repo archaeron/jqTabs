@@ -48,26 +48,7 @@ class jqTabs
 					self.seek toTab
 
 		if @settings.useHistory
-
-			historyChangeTab = (newHash) =>
-
-				changeTo = -1
-				@$tabs.each (index, elem) ->
-					href = $(elem).children('a').attr('href')
-					href = href.replace(/\#/, '')
-
-					if href == newHash
-						changeTo = index
-						return false
-				
-				if changeTo isnt -1
-					@seek changeTo
-
-			hasher.initialized.add historyChangeTab
-
-			hasher.changed.add historyChangeTab
-
-			hasher.init()
+			@setHashChange()
 
 
 	changeTab : (whereTo) =>
@@ -191,6 +172,28 @@ class jqTabs
 
 	makeContent: (content) =>
 		$('<div/>', { 'class': 'tabcontent ' + @settings.hiddenClass}).append(content)
+
+	setHashChange : () ->
+		
+		historyChangeTab = (newHash) =>
+
+				changeTo = -1
+				@$tabs.each (index, elem) ->
+					href = $(elem).children('a').attr('href')
+					href = href.replace(/\#/, '')
+
+					if href == newHash
+						changeTo = index
+						return false
+				
+				if changeTo isnt -1
+					@seek changeTo
+
+			hasher.initialized.add historyChangeTab
+
+			hasher.changed.add historyChangeTab
+
+			hasher.init()
 		
 
 window.jqTabs = jqTabs
