@@ -1,20 +1,19 @@
 class jqTabs
 	@VERSION : '0.4.2'
 
-	activeTab : 0
-	#default settings
-	settings :
-		activeClass: 'active'
-		useHistory: true
-		hiddenClass: 'hidden'
-		tabsClickable: true
-		callbacksBefore: {}
-		callbacksAfter: {}
-
 	#initial Setup
 	#-------------
 	constructor: (@$tabsContainer, options) ->
-		#reference to seek, so that we can use it later
+		@activeTab = 0
+
+		#default settings
+		@settings =
+			activeClass: 'active'
+			useHistory: true
+			hiddenClass: 'hidden'
+			tabsClickable: true
+			callbacksBefore: {}
+			callbacksAfter: {}
 
 		#extending the options with a jquery function
 		$.extend @settings, options
