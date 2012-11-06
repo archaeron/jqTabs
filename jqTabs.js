@@ -5,7 +5,7 @@
 
   jqTabs = (function() {
 
-    jqTabs.VERSION = '0.4.2';
+    jqTabs.VERSION = '0.4.5';
 
     function jqTabs($tabsContainer, options) {
       var _this = this;
