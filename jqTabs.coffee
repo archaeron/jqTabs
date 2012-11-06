@@ -20,7 +20,7 @@ class jqTabs
 		# if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
 		if @settings.useHistory and not hasher?
 			@settings.useHistory = false
-			
+
 		if not @settings.tabsClickable
 			@settings.useHistory = false
 
@@ -38,9 +38,9 @@ class jqTabs
 
 		$('ul.tab-headers', $tabsContainer).on 'click', 'li', (e) =>
 			e.preventDefault()
-			
+
 			if @settings.tabsClickable
-			
+
 				target = $ e.currentTarget
 
 				unless target.hasClass @settings.activeClass
@@ -64,7 +64,7 @@ class jqTabs
 
 		@$tabContent.addClass @settings.hiddenClass
 		$(@$tabContent[whereTo]).removeClass @settings.hiddenClass
-		
+
 	seek : (whereTo) =>
 		#only proceed, if the tab you want to seek to exists
 		if 0 > whereTo or whereTo >= @numTabs
@@ -81,12 +81,12 @@ class jqTabs
 				hasher.changed.active = false
 				hasher.setHash hash
 				hasher.changed.active = true
-			
+
 			@changeTab whereTo
 			if @settings.callbacksAfter[whereTo]?
 				@settings.callbacksAfter[whereTo]()
 		return
-	
+
 	next : ->
 		@seek (@activeTab + 1)
 		return
@@ -94,7 +94,7 @@ class jqTabs
 	previous : ->
 		@seek (@activeTab - 1)
 		return
-		
+
 	on : (index, position, callback) ->
 		switch position
 			when 'before'
@@ -141,7 +141,7 @@ class jqTabs
 			$newTabHeader = @makeHeader tabHeader
 			$newTabHeader.addClass @settings.activeClass
 			headerContainer.append($newTabHeader)
-			
+
 			$newTabContent = @makeContent tabContent
 			$newTabContent.removeClass @settings.hiddenClass
 			@$tabsContainer.append $newTabContent
@@ -161,10 +161,10 @@ class jqTabs
 
 		@updateElements()
 
-	removeLast: () ->
+	removeLast: ->
 
-	updateElements: () ->
 		@$tabs = $('ul.tab-headers li:not(.ignore-tab)', @$tabsContainer)
+	updateElements: ->
 		@$tabContent = @$tabsContainer.children('div')
 
 	makeHeader: (header) ->
@@ -173,8 +173,8 @@ class jqTabs
 	makeContent: (content) =>
 		$('<div/>', { 'class': 'tabcontent ' + @settings.hiddenClass}).append(content)
 
-	setHashChange : () ->
-		
+	setHashChange : ->
+
 		historyChangeTab = (newHash) =>
 
 				changeTo = -1
@@ -185,7 +185,7 @@ class jqTabs
 					if href == newHash
 						changeTo = index
 						return false
-				
+
 				if changeTo isnt -1
 					@seek changeTo
 
@@ -194,6 +194,6 @@ class jqTabs
 			hasher.changed.add historyChangeTab
 
 			hasher.init()
-		
+
 
 window.jqTabs = jqTabs
