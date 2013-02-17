@@ -36,7 +36,7 @@ class jqTabs
 		#and show only the first
 		$(@$tabContent[0]).removeClass @settings.hiddenClass
 
-		$('ul.tab-headers', $tabsContainer).on 'click', 'li', (e) =>
+		$('ul.tab-headers', @$tabsContainer).on 'click', 'li', (e) =>
 			e.preventDefault()
 
 			if @settings.tabsClickable
