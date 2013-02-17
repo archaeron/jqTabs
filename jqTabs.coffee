@@ -176,18 +176,17 @@ class jqTabs
 	setHashChange : ->
 
 		historyChangeTab = (newHash) =>
+			changeTo = -1
+			@$tabs.each (index, elem) ->
+				href = $(elem).children('a').attr('href')
+				href = href.replace(/\#/, '')
 
-				changeTo = -1
-				@$tabs.each (index, elem) ->
-					href = $(elem).children('a').attr('href')
-					href = href.replace(/\#/, '')
+				if href == newHash
+					changeTo = index
+					return false
 
-					if href == newHash
-						changeTo = index
-						return false
-
-				if changeTo isnt -1
-					@seek changeTo
+			if changeTo isnt -1
+				@seek changeTo
 
 			hasher.initialized.add historyChangeTab
 
