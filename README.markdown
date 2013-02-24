@@ -27,7 +27,7 @@ Methods
 		* `'change:#{id}'` : after the tab changes to tab #id
 		* `'change'` : after jqTabs changes to any tab
 	* `callback` : the callback function, if a `'beforeChange'` callback returns `false`, the tab won't change
-* `jqTabs::off(event, [callback])` - remove callback from tab. if callback is omitted, all callbacks will be rmeoved
+* `jqTabs::off(event, [callback])` - remove callback from tab. if `callback` is omitted, all callbacks will be removed
 
 Options
 -------
