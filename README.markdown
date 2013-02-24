@@ -6,16 +6,28 @@ Tabs
 * usable with [bootstrap](https://github.com/twitter/bootstrap)
 * printable
 
+Building
+--------
+
+```sh
+npm install
+make build
+```
+
 Methods
 -------
 
 * `jqTabs::seek(index)` - seeks to a tab, index 0-based
 * `jqTabs::next()` - go to next tab
 * `jqTabs::previous()` - go to previous tab
-* `jqTabs::on(index, position, callback)` - add a callback to a tab.
-	* `index` : index of the tab you want to add the callback to
-	* `position` : `'before'` or `'after'`, sets if the callback function should be called before or after the tab has been displayed
-	* `callback` : the callback function, if a `'before'` callback returns false, the tab won't change
+* `jqTabs::on(event, callback)` - add a callback to a tab.
+	* `event` : event in the form of:
+		* `beforeChange:#{id}` : before the tab changes to tab #id
+		* `beforeChange` : before jqTabs changes to any tab
+		* `change:#{id}` : after the tab changes to tab #id
+		* `change` : after jqTabs changes to any tab
+	* `callback` : the callback function, if a `'beforeChange'` callback returns false, the tab won't change
+* `jqTabs::off(event, [callback])` - remove callback from tab. if callback is omitted, all callbacks will be rmeoved
 
 Options
 -------

@@ -42,11 +42,17 @@
 				function()
 				{
 					var tabs = new jqTabs($("#tabbed"));
-					
-					tabs.on(1, 'before', function(){ alert('loading Tab 2');});
-					tabs.on(1, 'after', function(){ alert('Tab 2 loaded');});
-					
-					tabs.on(2, 'before',
+					tabs.on('change', function(id)
+						{
+							console.log(arguments);
+							alert('changed to tab #' + (id + 1));
+						}
+					);
+
+					tabs.on('beforeChange:1', function(){ alert('loading Tab 2');});
+					tabs.on('change:1', function(){ alert('Tab 2 loaded');});
+
+					tabs.on('beforeChange:2',
 						function()
 						{
 							alert('3rd tab will not load');

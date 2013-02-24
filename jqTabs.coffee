@@ -1,5 +1,6 @@
 class jqTabs
-	@VERSION : '0.4.6'
+	@VERSION : '1.0.0'
+	events : {}
 
 	#initial Setup
 	#-------------
@@ -12,8 +13,6 @@ class jqTabs
 			useHistory: true
 			hiddenClass: 'hidden'
 			tabsClickable: true
-			callbacksBefore: {}
-			callbacksAfter: {}
 
 		#extending the options with a jquery function
 		$.extend @settings, options
@@ -70,11 +69,9 @@ class jqTabs
 		if 0 > whereTo or whereTo >= @numTabs
 			return
 
-		go_on = true
-		if @settings.callbacksBefore[whereTo]?
-			go_on = @settings.callbacksBefore[whereTo]()
+		goOn = @trigger "beforeChange:#{whereTo}" or @trigger('beforeChange', whereTo)
 
-		if go_on isnt false
+		if goOn isnt false
 			if @settings.useHistory
 				$currentTab = $(@$tabs[whereTo])
 				hash = $currentTab.find('a').attr('href').replace(/\#/, '')
@@ -83,8 +80,10 @@ class jqTabs
 				hasher.changed.active = true
 
 			@changeTab whereTo
-			if @settings.callbacksAfter[whereTo]?
-				@settings.callbacksAfter[whereTo]()
+
+			@trigger "change:#{whereTo}"
+			@trigger 'change', whereTo
+
 		return
 
 	next : ->
@@ -95,12 +94,28 @@ class jqTabs
 		@seek (@activeTab - 1)
 		return
 
-	on : (index, position, callback) ->
-		switch position
-			when 'before'
-				@settings.callbacksBefore[index] = callback
-			when 'after'
-				@settings.callbacksAfter[index] = callback
+	on : (event, callback) ->
+		@events[event] = @events[event] or []
+		@events[event].push callback
+
+	off : (event, callback) ->
+		if not @events[event]
+			return
+
+		if callback
+			@events[event].splice @events[event].indexOf(callback), 1
+		else
+			delete @events[event]
+
+	trigger: (event, args...) ->
+		if not @events[event]
+			return
+
+		returnValues = for eventCallback in @events[event]
+			eventCallback.apply this, args
+
+		return not (false in returnValues)
+
 
 	insertAfter: (index, tabHeader, tabContent, select) ->
 		select = if select != undefined then select else true
