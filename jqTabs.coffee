@@ -1,5 +1,5 @@
 class jqTabs
-	@VERSION : '1.0.0'
+	@VERSION : '1.0.1'
 	events : {}
 
 	#initial Setup
@@ -203,11 +203,13 @@ class jqTabs
 			if changeTo isnt -1
 				@seek changeTo
 
-			hasher.initialized.add historyChangeTab
+		hasher.initialized.add historyChangeTab
 
-			hasher.changed.add historyChangeTab
+		hasher.changed.add historyChangeTab
 
-			hasher.init()
+		hasher.init()
+
+		return
 
 
 window.jqTabs = jqTabs

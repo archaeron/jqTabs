@@ -2,7 +2,7 @@
 void function () {
   var jqTabs;
   jqTabs = function () {
-    jqTabs.VERSION = '1.0.0';
+    jqTabs.VERSION = '1.0.1';
     jqTabs.prototype.events = {};
     function jqTabs(param$, options) {
       var instance$, this$;
@@ -176,7 +176,7 @@ void function () {
     };
     jqTabs.prototype.setHashChange = function () {
       var historyChangeTab, this$;
-      return historyChangeTab = (this$ = this, function (newHash) {
+      historyChangeTab = (this$ = this, function (newHash) {
         var changeTo;
         changeTo = -1;
         this$.$tabs.each(function (index, elem) {
@@ -189,11 +189,11 @@ void function () {
           }
         });
         if (changeTo !== -1)
-          this$.seek(changeTo);
-        hasher.initialized.add(historyChangeTab);
-        hasher.changed.add(historyChangeTab);
-        return hasher.init();
+          return this$.seek(changeTo);
       });
+      hasher.initialized.add(historyChangeTab);
+      hasher.changed.add(historyChangeTab);
+      hasher.init();
     };
     return jqTabs;
   }();
