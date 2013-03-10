@@ -165,7 +165,7 @@ void function () {
     jqTabs.prototype.removeLast = function () {
     };
     jqTabs.prototype.updateElements = function () {
-      this.$tabs = $('> ul.tab-headers li:not(.ignore-tab)', this.$tabsContainer);
+      this.$tabs = $('ul.tab-headers li:not(.ignore-tab)', this.$tabsContainer);
       return this.$tabContent = this.$tabsContainer.children('div');
     };
     jqTabs.prototype.makeHeader = function (header) {
