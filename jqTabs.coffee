@@ -179,7 +179,7 @@ class jqTabs
 	removeLast: ->
 
 	updateElements: ->
-		@$tabs = $('> ul.tab-headers li:not(.ignore-tab)', @$tabsContainer)
+		@$tabs = $('ul.tab-headers li:not(.ignore-tab)', @$tabsContainer)
 		@$tabContent = @$tabsContainer.children('div')
 
 	makeHeader: (header) ->
