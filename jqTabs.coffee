@@ -1,5 +1,4 @@
 class jqTabs
-	@VERSION : '1.0.1'
 	events : {}
 
 	#initial Setup
