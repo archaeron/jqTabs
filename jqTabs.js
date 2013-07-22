@@ -2,7 +2,6 @@
 void function () {
   var jqTabs;
   jqTabs = function () {
-    jqTabs.VERSION = '1.0.1';
     jqTabs.prototype.events = {};
     function jqTabs(param$, options) {
       var callback, event, instance$, this$;
