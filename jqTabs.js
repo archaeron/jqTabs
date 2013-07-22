@@ -5,7 +5,7 @@ void function () {
     jqTabs.VERSION = '1.0.1';
     jqTabs.prototype.events = {};
     function jqTabs(param$, options) {
-      var instance$, this$;
+      var callback, event, instance$, this$;
       instance$ = this;
       this.makeContent = function (a) {
         return jqTabs.prototype.makeContent.apply(instance$, arguments);
@@ -25,6 +25,11 @@ void function () {
         tabsClickable: true
       };
       $.extend(this.settings, options);
+      if (null != options.events)
+        for (event in options.events) {
+          callback = options.events[event];
+          this.on(event, callback);
+        }
       if (this.settings.useHistory && !('undefined' !== typeof hasher && null != hasher))
         this.settings.useHistory = false;
       if (!this.settings.tabsClickable)
@@ -61,7 +66,7 @@ void function () {
       var $currentTab, goOn, hash;
       if (0 > whereTo || whereTo >= this.numTabs)
         return;
-      goOn = this.trigger('beforeChange:' + whereTo || this.trigger('beforeChange', whereTo));
+      goOn = this.trigger('beforeChange:' + whereTo, whereTo) || this.trigger('beforeChange', whereTo);
       if (goOn !== false) {
         if (this.settings.useHistory) {
           $currentTab = $(this.$tabs[whereTo]);

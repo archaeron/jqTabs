@@ -19,6 +19,11 @@
 				Content 3
 			</div>
 		</div>
+
+		<div>
+			<h2>Events</h2>
+			<textarea class="events"></textarea>
+		</div>
 		<button class="btn" id="previous">Previous</button>
 		<button class="btn" id="next">Next</button>
 
@@ -32,6 +37,11 @@
 			{
 				color: blue;
 			}
+			.events
+			{
+				width: 100%;
+				height: 300px;
+			}
 		</style>
 		<script src="../thirdparty/js/jquery-1.7.1.min.js"></script>
 		<script src="../thirdparty/js/signals.min.js"></script>
@@ -41,24 +51,38 @@
 			$(document).ready(
 				function()
 				{
-					var tabs = new jqTabs($("#tabbed"));
-					tabs.on('change', function(id)
+					var options =
 						{
-							console.log(arguments);
-							alert('changed to tab #' + (id + 1));
-						}
-					);
+							'events':
+							{
+								'change': function(id)
+									{
+										logEvent('change', 'changed to tab #' + (id + 1));
+									},
+								'beforeChange:1': function()
+									{
+										logEvent('beforeChange:1', 'loading Tab 2');
+									},
+								'change:1': function()
+									{
+										logEvent('change:1', 'Tab 2 loaded');
+									},
+								'beforeChange:2': function()
+									{
+										logEvent('beforeChange:2', '3rd tab will not load');
+										return false;
+									}
+							}
+						},
+						events = $('.events'),
+						tabs = new jqTabs($("#tabbed"), options);
 
-					tabs.on('beforeChange:1', function(){ alert('loading Tab 2');});
-					tabs.on('change:1', function(){ alert('Tab 2 loaded');});
 
-					tabs.on('beforeChange:2',
-						function()
-						{
-							alert('3rd tab will not load');
-							return false;
-						}
-					);
+					function logEvent(type, message)
+					{
+						events.append(type + ': ' + message + '\n');
+					}
+
 
 					$('#next').click(function()
 					{

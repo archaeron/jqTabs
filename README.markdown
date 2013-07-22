@@ -36,6 +36,7 @@ Options
 * `hiddenClass` - class to be added to a hidden tab
 * `useHistory` - use the history, needs hasher and js-signals, default: `true`, if hasher isn't included it is set to `false` regardless of what was set in the options
 * `tabsClickable` - set to `false`, if you don't want the tabs in the tabbar to be clickable
+* `events` - object of form `{ 'change': function(){} }`. Used to set callbacks, that will be executed as soon as the page is loaded
 
 Dependencies
 ------------

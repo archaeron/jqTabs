@@ -14,8 +14,14 @@ class jqTabs
 			hiddenClass: 'hidden'
 			tabsClickable: true
 
-		#extending the options with a jquery function
+		# extending the options with a jquery function
 		$.extend @settings, options
+
+		# if there are events in the options object, attach them
+		if options.events?
+			for event, callback of options.events
+				@on event, callback
+
 		# if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
 		if @settings.useHistory and not hasher?
 			@settings.useHistory = false
@@ -69,7 +75,7 @@ class jqTabs
 		if 0 > whereTo or whereTo >= @numTabs
 			return
 
-		goOn = @trigger "beforeChange:#{whereTo}" or @trigger('beforeChange', whereTo)
+		goOn = @trigger("beforeChange:#{whereTo}", whereTo) or @trigger('beforeChange', whereTo)
 
 		if goOn isnt false
 			if @settings.useHistory
@@ -189,7 +195,6 @@ class jqTabs
 		$('<div/>', { 'class': 'tabcontent ' + @settings.hiddenClass}).append(content)
 
 	setHashChange : ->
-
 		historyChangeTab = (newHash) =>
 			changeTo = -1
 			@$tabs.each (index, elem) ->
