@@ -17,7 +17,7 @@ class jqTabs
 		$.extend @settings, options
 
 		# if there are events in the options object, attach them
-		if options.events?
+		if @settings.events?
 			for event, callback of options.events
 				@on event, callback
 

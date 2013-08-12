@@ -24,7 +24,7 @@ void function () {
         tabsClickable: true
       };
       $.extend(this.settings, options);
-      if (null != options.events)
+      if (null != this.settings.events)
         for (event in options.events) {
           callback = options.events[event];
           this.on(event, callback);
