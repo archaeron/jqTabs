@@ -1,9 +1,14 @@
 {
-	"name": "jqTabs",
-	"version": "0.4.6",
-	"dependencies" :
-	{
-		"coffee-script-redux" : "2.0.x",
-		"uglify-js"		:  "2.x"
-	}
+  "name": "jqTabs",
+  "version": "0.4.6",
+  "dependencies": {
+    "coffee-script-redux": "2.0.x",
+    "uglify-js": "2.x"
+  },
+  "devDependencies": {
+    "handlebars": "~1.0.12",
+    "grunt": "~0.4.1",
+    "grunt-contrib-handlebars": "~0.5.10",
+    "grunt-contrib-coffee": "~0.7.0"
+  }
 }

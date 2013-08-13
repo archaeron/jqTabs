@@ -16,6 +16,14 @@ class jqTabs
 		# extending the options with a jquery function
 		$.extend @settings, options
 
+		tabHeaders = getTabHeaders(@$tabsContainer)
+		tabContents = getTabContents(@$tabsContainer)
+		zippedHeadersAndContents = _.zip tabHeaders, tabContents
+
+		console.log zippedHeadersAndContents
+		console.log createTopHeaders(zippedHeadersAndContents)
+
+
 		# if there are events in the options object, attach them
 		if @settings.events?
 			for event, callback of options.events
@@ -215,5 +223,24 @@ class jqTabs
 
 		return
 
+getTabHeaders = (container) ->
+	headerContainers = container.find '.tab-header'
+
+	headers = _.map headerContainers, (headerContainer) ->
+		$(headerContainer).text()
+
+getTabContents = (container) ->
+	container.find '.tab-content'
+
+createTopHeaders = (headersAndContents) ->
+	headerContainer = $.parseHTML '<div class="tab-header-container"><ul class="tab-headers tabs"></ul></div>'
+	console.log headerContainer
+
+	headers = _.map headersAndContents, ([header, content]) ->
+		console.log header
+		console.log content
+		"<li><a href='#tab1'>#{header}</a></li>"
+
+	$('.tab-headers', headerContainer).append headers
 
 window.jqTabs = jqTabs

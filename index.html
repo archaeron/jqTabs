@@ -12,18 +12,16 @@
 		</ul>
 		<div id="content">
 			<div id="tabbed">
-				<ul class="tab-headers tabs">
-					<li><a href="#tab1">Tab 1</a></li>
-					<li><a href="#tab2">Tab 2</a></li>
-					<li><a href="#tab3">Tab 3</a></li>
-				</ul>
-				<div id="tab1" class="tabcontent">
+				<h1 class="tab-header"><a href="#tab1">Tab 1</a></h1>
+				<div id="tab1" class="tab-content">
 					Content 1
 				</div>
-				<div id="tab2" class="tabcontent">
+				<h1 class="tab-header"><a href="#tab2">Tab 2</a></h1>
+				<div id="tab2" class="tab-content">
 					Content 2
 				</div>
-				<div id="tab3" class="tabcontent">
+				<h1 class="tab-header"><a href="#tab3">Tab 3</a></h1>
+				<div id="tab3" class="tab-content">
 					Content 3
 				</div>
 			</div>
@@ -64,10 +62,11 @@
 				margin-bottom: 20px;
 			}
 		</style>
-		<script src="thirdparty/js/jquery-1.7.1.min.js"></script>
+		<script src="thirdparty/js/underscore.js"></script>
+		<script src="thirdparty/js/jquery.min.js"></script>
 		<script src="thirdparty/js/signals.min.js"></script>
 		<script src="thirdparty/js/hasher.min.js"></script>
-		<script src="jqTabs.min.js"></script>
+		<script src="jqTabs.js"></script>
 		<script>
 			$(document).ready(
 				function()
