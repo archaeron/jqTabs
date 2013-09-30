@@ -88,7 +88,7 @@ class jqTabs
 		if 0 > whereTo or whereTo >= @tabHeaders.length
 			return
 
-		goOn = @trigger("beforeChange:#{whereTo}", whereTo) or @trigger('beforeChange', whereTo)
+		goOn = @trigger("beforeChange:#{whereTo}", whereTo) and @trigger('beforeChange', whereTo)
 
 		if goOn isnt false
 			currentTab = @changeTab whereTo
