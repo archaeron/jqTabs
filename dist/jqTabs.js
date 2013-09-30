@@ -70,7 +70,8 @@
       if (0 > whereTo || whereTo >= this.tabHeaders.length) {
         return;
       }
-      goOn = this.trigger("beforeChange:" + whereTo, whereTo) || this.trigger('beforeChange', whereTo);
+      goOn = this.trigger("beforeChange:" + whereTo, whereTo) && this.trigger('beforeChange', whereTo);
+      console.log(goOn);
       if (goOn !== false) {
         currentTab = this.changeTab(whereTo);
         this.trigger("change:" + whereTo);
@@ -105,20 +106,22 @@
     jqTabs.prototype.trigger = function() {
       var args, event, eventCallback, returnValues;
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      console.log(event, this.events[event]);
       if (!this.events[event]) {
-        return;
+        return true;
+      } else {
+        returnValues = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.events[event];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            eventCallback = _ref[_i];
+            _results.push(eventCallback.apply(this, args));
+          }
+          return _results;
+        }).call(this);
+        return !(__indexOf.call(returnValues, false) >= 0);
       }
-      returnValues = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.events[event];
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          eventCallback = _ref[_i];
-          _results.push(eventCallback.apply(this, args));
-        }
-        return _results;
-      }).call(this);
-      return !(__indexOf.call(returnValues, false) >= 0);
     };
 
     jqTabs.prototype.insertAfter = function(index, tabHeader, tabContent, select) {
