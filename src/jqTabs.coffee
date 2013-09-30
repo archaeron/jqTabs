@@ -127,12 +127,12 @@ class jqTabs
 
 	trigger: (event, args...) ->
 		if not @events[event]
-			return
+			true
+		else
+			returnValues = for eventCallback in @events[event]
+				eventCallback.apply this, args
 
-		returnValues = for eventCallback in @events[event]
-			eventCallback.apply this, args
-
-		return not (false in returnValues)
+			not (false in returnValues)
 
 
 	insertAfter: (index, tabHeader, tabContent, select) ->
