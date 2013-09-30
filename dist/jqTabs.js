@@ -1,5 +1,5 @@
 (function() {
-  var createTopHeaders, getTabContents, getTabHeaders, jqTabs,
+  var createTopHeaders, getTabContents, getTabHeaders, jqTabs, makeHeader,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -7,26 +7,24 @@
   jqTabs = (function() {
     jqTabs.prototype.events = {};
 
-    function jqTabs($tabsContainer, options) {
-      var callback, event, tabContents, tabHeaders, zippedHeadersAndContents, _ref,
-        _this = this;
-      this.$tabsContainer = $tabsContainer;
+    function jqTabs(el, options) {
+      var callback, event, topHeaders, _ref;
+      this.el = el;
       this.makeContent = __bind(this.makeContent, this);
       this.seek = __bind(this.seek, this);
       this.changeTab = __bind(this.changeTab, this);
       this.activeTab = 0;
       this.settings = {
         activeClass: 'active',
+        inactiveClass: 'inactive',
         useHistory: true,
-        hiddenClass: 'hidden',
         tabsClickable: true
       };
       $.extend(this.settings, options);
-      tabHeaders = getTabHeaders(this.$tabsContainer);
-      tabContents = getTabContents(this.$tabsContainer);
-      zippedHeadersAndContents = _.zip(tabHeaders, tabContents);
-      console.log(zippedHeadersAndContents);
-      console.log(createTopHeaders(zippedHeadersAndContents));
+      this.tabHeaders = getTabHeaders(this.el);
+      this.tabContents = getTabContents(this.el);
+      topHeaders = createTopHeaders(this.tabHeaders);
+      this.el.prepend(topHeaders);
       if (this.settings.events != null) {
         _ref = options.events;
         for (event in _ref) {
@@ -34,58 +32,47 @@
           this.on(event, callback);
         }
       }
-      if (this.settings.useHistory && (typeof hasher === "undefined" || hasher === null)) {
-        this.settings.useHistory = false;
-      }
-      if (!this.settings.tabsClickable) {
-        this.settings.useHistory = false;
-      }
-      this.updateElements();
-      this.numTabs = this.$tabContent.length;
-      $(this.$tabs[0]).addClass(this.settings.activeClass);
-      this.$tabContent.addClass(this.settings.hiddenClass);
-      $(this.$tabContent[0]).removeClass(this.settings.hiddenClass);
-      $('ul.tab-headers', this.$tabsContainer).on('click', 'li', function(e) {
-        var target, toTab;
-        e.preventDefault();
-        if (_this.settings.tabsClickable) {
-          target = $(e.currentTarget);
-          if (!target.hasClass(_this.settings.activeClass)) {
-            toTab = _this.$tabs.index(target);
-            return _this.seek(toTab);
-          }
-        }
-      });
-      if (this.settings.useHistory) {
-        this.setHashChange();
-      }
+      this.setActiveHeader(0);
+      this.setActiveContent(0);
+      this.tabContents.addClass(this.settings.hiddenClass);
+      $(this.tabContents[0]).removeClass(this.settings.hiddenClass);
+      this.attachEventsToHeaders(this.tabHeaders);
     }
 
+    jqTabs.prototype.attachEventsToHeaders = function(headers) {
+      var _this = this;
+      return headers.each(function(i, header) {
+        console.log(header);
+        return $(header).click(function(e) {
+          var target;
+          e.preventDefault();
+          if (_this.settings.tabsClickable) {
+            target = $(e.currentTarget);
+            if (!target.hasClass(_this.settings.activeClass)) {
+              return _this.seek(i);
+            }
+          }
+        });
+      });
+    };
+
     jqTabs.prototype.changeTab = function(whereTo) {
-      var $currentTab;
-      $currentTab = $(this.$tabs[whereTo]);
+      var currentTab;
+      currentTab = $(this.tabHeaders[whereTo]);
       this.activeTab = whereTo;
-      this.$tabs.removeClass(this.settings.activeClass);
-      $currentTab.addClass(this.settings.activeClass);
-      this.$tabContent.addClass(this.settings.hiddenClass);
-      return $(this.$tabContent[whereTo]).removeClass(this.settings.hiddenClass);
+      this.setActiveHeader(whereTo);
+      this.setActiveContent(whereTo);
+      return currentTab;
     };
 
     jqTabs.prototype.seek = function(whereTo) {
-      var $currentTab, goOn, hash;
-      if (0 > whereTo || whereTo >= this.numTabs) {
+      var currentTab, goOn;
+      if (0 > whereTo || whereTo >= this.tabHeaders.length) {
         return;
       }
       goOn = this.trigger("beforeChange:" + whereTo, whereTo) || this.trigger('beforeChange', whereTo);
       if (goOn !== false) {
-        if (this.settings.useHistory) {
-          $currentTab = $(this.$tabs[whereTo]);
-          hash = $currentTab.find('a').attr('href').replace(/\#/, '');
-          hasher.changed.active = false;
-          hasher.setHash(hash);
-          hasher.changed.active = true;
-        }
-        this.changeTab(whereTo);
+        currentTab = this.changeTab(whereTo);
         this.trigger("change:" + whereTo);
         this.trigger('change', whereTo);
       }
@@ -171,13 +158,13 @@
     jqTabs.prototype.addTab = function(tabHeader, tabContent, select) {
       var $newTabContent, $newTabHeader, headerContainer;
       if (this.numTabs === 0) {
-        headerContainer = this.$tabsContainer.find('.tab-headers');
+        headerContainer = this.el.find('.tab-headers');
         $newTabHeader = this.makeHeader(tabHeader);
         $newTabHeader.addClass(this.settings.activeClass);
         headerContainer.append($newTabHeader);
         $newTabContent = this.makeContent(tabContent);
         $newTabContent.removeClass(this.settings.hiddenClass);
-        this.$tabsContainer.append($newTabContent);
+        this.el.append($newTabContent);
         this.updateElements();
         this.numTabs++;
         return $newTabContent;
@@ -194,15 +181,6 @@
     };
 
     jqTabs.prototype.removeLast = function() {};
-
-    jqTabs.prototype.updateElements = function() {
-      this.$tabs = $('ul.tab-headers li:not(.ignore-tab)', this.$tabsContainer);
-      return this.$tabContent = this.$tabsContainer.children('div');
-    };
-
-    jqTabs.prototype.makeHeader = function(header) {
-      return $('<li/>').append(header);
-    };
 
     jqTabs.prototype.makeContent = function(content) {
       return $('<div/>', {
@@ -234,36 +212,49 @@
       hasher.init();
     };
 
+    jqTabs.prototype.setActiveHeader = function(whereTo) {
+      return this.setActiveElement(this.tabHeaders, whereTo);
+    };
+
+    jqTabs.prototype.setActiveContent = function(whereTo) {
+      return this.setActiveElement(this.tabContents, whereTo);
+    };
+
+    jqTabs.prototype.setActiveElement = function(element, whereTo) {
+      element.removeClass(this.settings.activeClass);
+      element.addClass(this.settings.inactiveClass);
+      return $(element[whereTo]).addClass(this.settings.activeClass).removeClass(this.settings.inactiveClass);
+    };
+
     return jqTabs;
 
   })();
 
   getTabHeaders = function(container) {
-    var headerContainers, headers;
-    headerContainers = container.find('.tab-header');
-    return headers = _.map(headerContainers, function(headerContainer) {
-      return $(headerContainer).text();
-    });
+    var headerContainers;
+    headerContainers = container.find('.tab-header').detach();
+    return headerContainers.wrap('<li />');
   };
 
   getTabContents = function(container) {
     return container.find('.tab-content');
   };
 
-  createTopHeaders = function(headersAndContents) {
-    var headerContainer, headers;
-    headerContainer = $.parseHTML('<div class="tab-header-container"><ul class="tab-headers tabs"></ul></div>');
-    console.log(headerContainer);
-    headers = _.map(headersAndContents, function(_arg) {
-      var content, header;
-      header = _arg[0], content = _arg[1];
-      console.log(header);
-      console.log(content);
-      return "<li><a href='#tab1'>" + header + "</a></li>";
-    });
-    return $('.tab-headers', headerContainer).append(headers);
+  makeHeader = function(header) {
+    return $('<li/>').append(header);
+  };
+
+  createTopHeaders = function(tabHeaders) {
+    var headerContainer, headerList;
+    headerContainer = $($.parseHTML('<div class="tab-header-container"></div>'));
+    headerList = $($.parseHTML('<ul class="tab-headers tabs"></ul>'));
+    return headerList.append(tabHeaders);
   };
 
   window.jqTabs = jqTabs;
 
 }).call(this);
+
+/*
+//@ sourceMappingURL=jqTabs.js.map
+*/

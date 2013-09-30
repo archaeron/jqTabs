@@ -3,25 +3,28 @@ class jqTabs
 
 	#initial Setup
 	#-------------
-	constructor: (@$tabsContainer, options) ->
+	constructor: (@el, options) ->
 		@activeTab = 0
 
 		#default settings
 		@settings =
 			activeClass: 'active'
+			inactiveClass: 'inactive'
 			useHistory: true
-			hiddenClass: 'hidden'
 			tabsClickable: true
 
 		# extending the options with a jquery function
 		$.extend @settings, options
 
-		tabHeaders = getTabHeaders(@$tabsContainer)
-		tabContents = getTabContents(@$tabsContainer)
-		zippedHeadersAndContents = _.zip tabHeaders, tabContents
+		# find Headers and Content in the element
+		@tabHeaders = getTabHeaders(@el)
+		@tabContents = getTabContents(@el)
 
-		console.log zippedHeadersAndContents
-		console.log createTopHeaders(zippedHeadersAndContents)
+		# create a new element and add the headers to it
+		topHeaders = createTopHeaders(@tabHeaders)
+
+		# prepend the headers to the main element
+		@el.prepend topHeaders
 
 
 		# if there are events in the options object, attach them
@@ -29,89 +32,91 @@ class jqTabs
 			for event, callback of options.events
 				@on event, callback
 
-		# if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
-		if @settings.useHistory and not hasher?
-			@settings.useHistory = false
+		# # if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
+		# if @settings.useHistory and not hasher?
+		# 	@settings.useHistory = false
 
-		if not @settings.tabsClickable
-			@settings.useHistory = false
+		# if not @settings.tabsClickable
+		# 	@settings.useHistory = false
 
-		#creating a `jQuery` object for the tabHeaders, tabContents
-		@updateElements()
-		#saving the number of tabs
-		@numTabs = @$tabContent.length
 
-		#giving the fist tab the 'activeClass' (it is possible to change the name of this class by #passing an optional settings object as the second parameter to the constructor)
-		$(@$tabs[0]).addClass @settings.activeClass
+		# giving the fist tab the 'activeClass' (it is possible to change the name of this class by
+		# passing an optional settings object as the second parameter to the constructor)
+		@setActiveHeader 0
+		@setActiveContent 0
+
 		#hide all tabs
-		@$tabContent.addClass @settings.hiddenClass
+		@tabContents.addClass @settings.hiddenClass
 		#and show only the first
-		$(@$tabContent[0]).removeClass @settings.hiddenClass
+		$(@tabContents[0]).removeClass @settings.hiddenClass
 
-		$('ul.tab-headers', @$tabsContainer).on 'click', 'li', (e) =>
-			e.preventDefault()
+		@attachEventsToHeaders @tabHeaders
 
-			if @settings.tabsClickable
+	attachEventsToHeaders: (headers) ->
+		headers.each (i, header) =>
+			console.log header
+			$(header).click (e) =>
+				e.preventDefault()
 
-				target = $ e.currentTarget
+				if @settings.tabsClickable
 
-				unless target.hasClass @settings.activeClass
-					toTab = @$tabs.index target
-					@seek toTab
+					target = $ e.currentTarget
 
-		if @settings.useHistory
-			@setHashChange()
+					unless target.hasClass @settings.activeClass
+						@seek i
+
+				# if @settings.useHistory
+				# 	@setHashChange()
+
 
 	changeTab : (whereTo) =>
-		#save reference to current tab
-		$currentTab = $(@$tabs[whereTo])
+		# save reference to current tab
+		currentTab = $(@tabHeaders[whereTo])
 
-		#set the active tab, to the tab we seek to
+		# set the active tab, to the tab we seek to
 		@activeTab = whereTo
 
-		#remove the `settings.activeClass` from all tabs
-		@$tabs.removeClass @settings.activeClass
-		#and ad it only to the current tab
-		$currentTab.addClass @settings.activeClass
+		@setActiveHeader whereTo
+		@setActiveContent whereTo
+		# @$tabContent.addClass @settings.hiddenClass
+		# $(@$tabContent[whereTo]).removeClass @settings.hiddenClass
 
-		@$tabContent.addClass @settings.hiddenClass
-		$(@$tabContent[whereTo]).removeClass @settings.hiddenClass
+		currentTab
 
 	seek : (whereTo) =>
 		#only proceed, if the tab you want to seek to exists
-		if 0 > whereTo or whereTo >= @numTabs
+		if 0 > whereTo or whereTo >= @tabHeaders.length
 			return
 
 		goOn = @trigger("beforeChange:#{whereTo}", whereTo) or @trigger('beforeChange', whereTo)
 
 		if goOn isnt false
-			if @settings.useHistory
-				$currentTab = $(@$tabs[whereTo])
-				hash = $currentTab.find('a').attr('href').replace(/\#/, '')
-				hasher.changed.active = false
-				hasher.setHash hash
-				hasher.changed.active = true
+			currentTab = @changeTab whereTo
 
-			@changeTab whereTo
+			# if @settings.useHistory
+			# 	hash = $currentTab.find('a').attr('href').replace(/\#/, '')
+			# 	hasher.changed.active = false
+			# 	hasher.setHash hash
+			# 	hasher.changed.active = true
 
 			@trigger "change:#{whereTo}"
 			@trigger 'change', whereTo
 
 		return
 
-	next : ->
+	next: ->
 		@seek (@activeTab + 1)
 		return
 
-	previous : ->
+	previous: ->
 		@seek (@activeTab - 1)
 		return
 
-	on : (event, callback) ->
+	on: (event, callback) ->
 		@events[event] = @events[event] or []
 		@events[event].push callback
 
-	off : (event, callback) ->
+	off: (event, callback) ->
 		if not @events[event]
 			return
 
@@ -165,14 +170,14 @@ class jqTabs
 
 	addTab: (tabHeader, tabContent, select) ->
 		if @numTabs is 0
-			headerContainer = @$tabsContainer.find('.tab-headers')
+			headerContainer = @el.find('.tab-headers')
 			$newTabHeader = @makeHeader tabHeader
 			$newTabHeader.addClass @settings.activeClass
 			headerContainer.append($newTabHeader)
 
 			$newTabContent = @makeContent tabContent
 			$newTabContent.removeClass @settings.hiddenClass
-			@$tabsContainer.append $newTabContent
+			@el.append $newTabContent
 
 			@updateElements()
 			@numTabs++
@@ -190,13 +195,6 @@ class jqTabs
 		@updateElements()
 
 	removeLast: ->
-
-	updateElements: ->
-		@$tabs = $('ul.tab-headers li:not(.ignore-tab)', @$tabsContainer)
-		@$tabContent = @$tabsContainer.children('div')
-
-	makeHeader: (header) ->
-		$('<li/>').append(header)
 
 	makeContent: (content) =>
 		$('<div/>', { 'class': 'tabcontent ' + @settings.hiddenClass}).append(content)
@@ -223,24 +221,34 @@ class jqTabs
 
 		return
 
-getTabHeaders = (container) ->
-	headerContainers = container.find '.tab-header'
+	setActiveHeader: (whereTo) ->
+		@setActiveElement @tabHeaders, whereTo
 
-	headers = _.map headerContainers, (headerContainer) ->
-		$(headerContainer).text()
+	setActiveContent: (whereTo) ->
+		@setActiveElement @tabContents, whereTo
+
+	setActiveElement: (element, whereTo) ->
+		# remove the `activeClass` from all tabs
+		element.removeClass @settings.activeClass
+		element.addClass @settings.inactiveClass
+		# and ad it only to the current tab
+		$(element[whereTo]).addClass(@settings.activeClass).removeClass(@settings.inactiveClass)
+
+
+
+getTabHeaders = (container) ->
+	headerContainers = container.find('.tab-header').detach()
+	headerContainers.wrap '<li />'
 
 getTabContents = (container) ->
 	container.find '.tab-content'
 
-createTopHeaders = (headersAndContents) ->
-	headerContainer = $.parseHTML '<div class="tab-header-container"><ul class="tab-headers tabs"></ul></div>'
-	console.log headerContainer
+makeHeader = (header) ->
+		$('<li/>').append(header)
 
-	headers = _.map headersAndContents, ([header, content]) ->
-		console.log header
-		console.log content
-		"<li><a href='#tab1'>#{header}</a></li>"
-
-	$('.tab-headers', headerContainer).append headers
+createTopHeaders = (tabHeaders) ->
+	headerContainer = $($.parseHTML '<div class="tab-header-container"></div>')
+	headerList = $($.parseHTML '<ul class="tab-headers tabs"></ul>')
+	headerList.append tabHeaders
 
 window.jqTabs = jqTabs

@@ -1,47 +1,60 @@
 <html>
 	<head>
+		<link href="thirdparty/css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	<body>
-		<ul>
-			<li><a href="examples/barebone.html">Barebone Example</a></li>
-			<li><a href="examples/zepto.html">Zepto Example</a></li>
-			<li><a href="examples/bootstrap.html">Bootstrap</a></li>
-			<li><a href="examples/history.html">History support</a></li>
-			<li><a href="examples/callbacks.html">Callbacks</a></li>
-			<li><a href="examples/dynamic.html">Dynamic Tabs</a></li>
-		</ul>
-		<div id="content">
-			<div id="tabbed">
-				<h1 class="tab-header"><a href="#tab1">Tab 1</a></h1>
-				<div id="tab1" class="tab-content">
-					Content 1
-				</div>
-				<h1 class="tab-header"><a href="#tab2">Tab 2</a></h1>
-				<div id="tab2" class="tab-content">
-					Content 2
-				</div>
-				<h1 class="tab-header"><a href="#tab3">Tab 3</a></h1>
-				<div id="tab3" class="tab-content">
-					Content 3
+		<article class="main-container">
+			<ul>
+				<li><a href="examples/barebone.html">Barebone Example</a></li>
+				<li><a href="examples/zepto.html">Zepto Example</a></li>
+				<li><a href="examples/bootstrap.html">Bootstrap</a></li>
+				<li><a href="examples/history.html">History support</a></li>
+				<li><a href="examples/callbacks.html">Callbacks</a></li>
+				<li><a href="examples/dynamic.html">Dynamic Tabs</a></li>
+			</ul>
+			<div class="row">
+				<div class="col-sm-12">
+					<div id="tabbed">
+						<div class="content">
+							<h1 class="tab-header"><a href="#tab1">Tab 1</a></h1>
+							<div id="tab1" class="tab-content">
+								Content 1
+							</div>
+							<h1 class="tab-header"><a href="#tab2">Tab 2</a></h1>
+							<div id="tab2" class="tab-content">
+								Content 2
+							</div>
+							<h1 class="tab-header"><a href="#tab3">Tab 3</a></h1>
+							<div id="tab3" class="tab-content">
+								Content 3
+							</div>
+
+						</div>
+					</div>
 				</div>
 			</div>
-			<button class="btn" id="previous">Previous</button>
-			<button class="btn" id="next">Next</button>
-		</div>
+		</article>
+		<button class="btn" id="previous">Previous</button>
+		<button class="btn" id="next">Next</button>
 		<style>
 			#content
 			{
 				margin: 20px;
 			}
 
-			.hidden
+			.content .tab-content.inactive
 			{
 				display: none;
 			}
 
 			.active
 			{
-				color: blue;
+				background-color: #34495E;
+			}
+			.main-container
+			{
+				width: 90%;
+				margin: auto;
 			}
 		</style>
 		<style media="print">
@@ -66,7 +79,7 @@
 		<script src="thirdparty/js/jquery.min.js"></script>
 		<script src="thirdparty/js/signals.min.js"></script>
 		<script src="thirdparty/js/hasher.min.js"></script>
-		<script src="jqTabs.js"></script>
+		<script src="dist/jqTabs.js"></script>
 		<script>
 			$(document).ready(
 				function()
