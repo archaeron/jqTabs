@@ -1,0 +1,22 @@
+{
+  "name": "jqTabs",
+  "version": "2.0.0",
+  "homepage": "https://github.com/archaeron/jqTabs",
+  "authors": [
+    "archaeron <whatamaps@gmail.com>"
+  ],
+  "description": "jQuery Tabs",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "thirdparty/js",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.0.3"
+  }
+}
