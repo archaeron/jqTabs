@@ -218,8 +218,11 @@ getTabContents = (container) ->
 urlifyTabHeaders = (headers) ->
 	Array.prototype.map.call headers, (header) ->
 		headerElement = $ header
+		a = headerElement.find 'a'
 		if headerElement.data 'title'
 			headerElement.data 'title'
+		else if a.length
+			a.attr('href').replace '#', ''
 		else
 			slugify headerElement.text()
 
