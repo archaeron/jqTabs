@@ -181,10 +181,13 @@
 
   urlifyTabHeaders = function(headers) {
     return Array.prototype.map.call(headers, function(header) {
-      var headerElement;
+      var a, headerElement;
       headerElement = $(header);
+      a = headerElement.find('a');
       if (headerElement.data('title')) {
         return headerElement.data('title');
+      } else if (a.length) {
+        return a.attr('href').replace('#', '');
       } else {
         return slugify(headerElement.text());
       }
