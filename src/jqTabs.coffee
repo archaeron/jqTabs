@@ -4,21 +4,20 @@ class jqTabs
 	#initial Setup
 	#-------------
 	constructor: (@el, options) ->
-		@activeTab = 0
-
 		#default settings
 		@settings =
+			initialTab: 0
 			activeClass: 'active'
 			inactiveClass: 'inactive'
-			useHistory: true
 			tabsClickable: true
 
 		# extending the options with a jquery function
 		$.extend @settings, options
 
 		# find Headers and Content in the element
-		@tabHeaders = getTabHeaders(@el)
-		@tabContents = getTabContents(@el)
+		@tabHeaders = getTabHeaders @el
+		@tabContents = getTabContents @el
+		@urlTabHeaders = urlifyTabHeaders @tabHeaders
 
 		# create a new element and add the headers to it
 		topHeaders = createTopHeaders(@tabHeaders)
@@ -32,29 +31,16 @@ class jqTabs
 			for event, callback of options.events
 				@on event, callback
 
-		# # if the `hasher` library isn't loaded, set useHistory to false regardles of previous setting
-		# if @settings.useHistory and not hasher?
-		# 	@settings.useHistory = false
+		@activeTab = @getInitialTab options, @urlTabHeaders
 
-		# if not @settings.tabsClickable
-		# 	@settings.useHistory = false
-
-
-		# giving the fist tab the 'activeClass' (it is possible to change the name of this class by
-		# passing an optional settings object as the second parameter to the constructor)
-		@setActiveHeader 0
-		@setActiveContent 0
-
-		#hide all tabs
-		@tabContents.addClass @settings.hiddenClass
-		#and show only the first
-		$(@tabContents[0]).removeClass @settings.hiddenClass
+		@seek @activeTab
 
 		@attachEventsToHeaders @tabHeaders
+		@changeHashOnChangeTab @urlTabHeaders
+
 
 	attachEventsToHeaders: (headers) ->
 		headers.each (i, header) =>
-			console.log header
 			$(header).click (e) =>
 				e.preventDefault()
 
@@ -64,9 +50,6 @@ class jqTabs
 
 					unless target.hasClass @settings.activeClass
 						@seek i
-
-				# if @settings.useHistory
-				# 	@setHashChange()
 
 
 	changeTab : (whereTo) =>
@@ -78,31 +61,24 @@ class jqTabs
 
 		@setActiveHeader whereTo
 		@setActiveContent whereTo
-		# @$tabContent.addClass @settings.hiddenClass
-		# $(@$tabContent[whereTo]).removeClass @settings.hiddenClass
 
 		currentTab
 
 	seek : (whereTo) =>
 		#only proceed, if the tab you want to seek to exists
 		if 0 > whereTo or whereTo >= @tabHeaders.length
-			return
+			false
+		else
+			goOn = @trigger("beforeChange:#{whereTo}", whereTo) and @trigger('beforeChange', whereTo)
 
-		goOn = @trigger("beforeChange:#{whereTo}", whereTo) and @trigger('beforeChange', whereTo)
+			if goOn
+				currentTab = @changeTab whereTo
 
-		if goOn isnt false
-			currentTab = @changeTab whereTo
-
-			# if @settings.useHistory
-			# 	hash = $currentTab.find('a').attr('href').replace(/\#/, '')
-			# 	hasher.changed.active = false
-			# 	hasher.setHash hash
-			# 	hasher.changed.active = true
-
-			@trigger "change:#{whereTo}"
-			@trigger 'change', whereTo
-
-		return
+				@trigger "change:#{whereTo}"
+				@trigger 'change', whereTo
+				true
+			else
+				false
 
 	next: ->
 		@seek (@activeTab + 1)
@@ -135,91 +111,88 @@ class jqTabs
 			not (false in returnValues)
 
 
-	insertAfter: (index, tabHeader, tabContent, select) ->
-		select = if select != undefined then select else true
+	# insertAfter: (index, tabHeader, tabContent, select) ->
+	# 	select = if select != undefined then select else true
 
-		$tabHeader = $(@$tabs[index])
-		$newTabHeader = @makeHeader(tabHeader)
-		$tabHeader.after($newTabHeader)
+	# 	$tabHeader = $(@$tabs[index])
+	# 	$newTabHeader = @makeHeader(tabHeader)
+	# 	$tabHeader.after($newTabHeader)
 
-		$tabContent = $(@$tabContent[index])
-		$newTabContent = @makeContent(tabContent)
-		$tabContent.after($newTabContent)
+	# 	$tabContent = $(@$tabContent[index])
+	# 	$newTabContent = @makeContent(tabContent)
+	# 	$tabContent.after($newTabContent)
 
-		@numTabs++
-		@updateElements()
-		@seek(index + 1) if select
+	# 	@numTabs++
+	# 	@updateElements()
+	# 	@seek(index + 1) if select
 
-		$newTabContent
+	# 	$newTabContent
 
-	insertBefore: (index, tabHeader, tabContent, select) ->
-		select = if select != undefined then select else true
-		$tabHeader = $(@$tabs[index])
-		$newTabHeader = @makeHeader tabHeader
-		$tabHeader.before($newTabHeader)
+	# insertBefore: (index, tabHeader, tabContent, select) ->
+	# 	select = if select != undefined then select else true
+	# 	$tabHeader = $(@$tabs[index])
+	# 	$newTabHeader = @makeHeader tabHeader
+	# 	$tabHeader.before($newTabHeader)
 
-		$tabContent = $(@$tabContent[index])
-		$newTabContent = @makeContent tabContent
-		$tabContent.before($newTabContent)
+	# 	$tabContent = $(@$tabContent[index])
+	# 	$newTabContent = @makeContent tabContent
+	# 	$tabContent.before($newTabContent)
 
-		@numTabs++
-		@updateElements()
-		@seek(index + 1) if select
+	# 	@numTabs++
+	# 	@updateElements()
+	# 	@seek(index + 1) if select
 
-		$newTabContent
+	# 	$newTabContent
 
-	addTab: (tabHeader, tabContent, select) ->
-		if @numTabs is 0
-			headerContainer = @el.find('.tab-headers')
-			$newTabHeader = @makeHeader tabHeader
-			$newTabHeader.addClass @settings.activeClass
-			headerContainer.append($newTabHeader)
+	# addTab: (tabHeader, tabContent, select) ->
+	# 	if @numTabs is 0
+	# 		headerContainer = @el.find('.tab-headers')
+	# 		$newTabHeader = @makeHeader tabHeader
+	# 		$newTabHeader.addClass @settings.activeClass
+	# 		headerContainer.append($newTabHeader)
 
-			$newTabContent = @makeContent tabContent
-			$newTabContent.removeClass @settings.hiddenClass
-			@el.append $newTabContent
+	# 		$newTabContent = @makeContent tabContent
+	# 		$newTabContent.removeClass @settings.hiddenClass
+	# 		@el.append $newTabContent
 
-			@updateElements()
-			@numTabs++
+	# 		@updateElements()
+	# 		@numTabs++
 
-			$newTabContent
+	# 		$newTabContent
+	# 	else
+	# 		@insertAfter @numTabs - 1, tabHeader, tabContent, select
+
+	# removeTab: (index) ->
+	# 	$(@$tabs[index]).remove()
+	# 	$(@$tabContent[index]).remove()
+
+	# 	@numTabs--
+
+	# 	@updateElements()
+
+	# removeLast: ->
+
+	getInitialTab: (options, headers) ->
+		initialTab = @getInitialTabSettings(options, headers)
+
+		if initialTab < 0
+			@settings.initialTab
 		else
-			@insertAfter @numTabs - 1, tabHeader, tabContent, select
+			initialTab
 
-	removeTab: (index) ->
-		$(@$tabs[index]).remove()
-		$(@$tabContent[index]).remove()
+	getInitialTabSettings: (options, headers) ->
+		if options?.initialTab?
+			options.initialTab
+		else if location.hash?
+			hash = location.hash.slice 1
+			headers.indexOf hash
+		else
+			-1
 
-		@numTabs--
 
-		@updateElements()
-
-	removeLast: ->
-
-	makeContent: (content) =>
-		$('<div/>', { 'class': 'tabcontent ' + @settings.hiddenClass}).append(content)
-
-	setHashChange : ->
-		historyChangeTab = (newHash) =>
-			changeTo = -1
-			@$tabs.each (index, elem) ->
-				href = $(elem).children('a').attr('href')
-				href = href.replace(/\#/, '')
-
-				if href == newHash
-					changeTo = index
-					return false
-
-			if changeTo isnt -1
-				@seek changeTo
-
-		hasher.initialized.add historyChangeTab
-
-		hasher.changed.add historyChangeTab
-
-		hasher.init()
-
-		return
+	changeHashOnChangeTab: (headers) ->
+		@on 'change', (tabNr) ->
+			location.replace "##{headers[tabNr]}"
 
 	setActiveHeader: (whereTo) ->
 		@setActiveElement @tabHeaders, whereTo
@@ -243,12 +216,45 @@ getTabHeaders = (container) ->
 getTabContents = (container) ->
 	container.find '.tab-content'
 
-makeHeader = (header) ->
-		$('<li/>').append(header)
+urlifyTabHeaders = (headers) ->
+	Array.prototype.map.call headers, (header) ->
+		headerElement = $ header
+		if headerElement.data 'title'
+			headerElement.data 'title'
+		else
+			slugify headerElement.text()
 
 createTopHeaders = (tabHeaders) ->
 	headerContainer = $($.parseHTML '<div class="tab-header-container"></div>')
 	headerList = $($.parseHTML '<ul class="tab-headers tabs"></ul>')
 	headerList.append tabHeaders
+
+# from https://github.com/epeli/underscore.string/blob/master/lib/underscore.string.js
+trim = (str) ->
+	if str?
+		if String.prototype.trim
+			String.prototype.trim.call str
+		else
+			String(str).replace(new RegExp('\^\\s+|\\s+$', 'g'), '')
+	else
+		''
+
+dasherize = (str) ->
+	trim(str).replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase()
+
+slugify = (str) ->
+	if str?
+		from  = 'ąàáäâãåæăćęèéëêìíïîłńòóöôõøśșțùúüûñçżź'
+		to    = "aaaaaaaaaceeeeeiiiilnoooooosstuuuunczz"
+		regex = new RegExp("[#{from}]", 'g')
+
+		str = String(str).toLowerCase().replace regex, (c) ->
+			index = from.indexOf(c);
+			to.charAt(index) || '-'
+
+		dasherize str.replace(/[^\w\s-]/g, '')
+	else
+		''
+
 
 window.jqTabs = jqTabs

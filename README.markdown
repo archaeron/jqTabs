@@ -2,7 +2,6 @@ Tabs
 ===========
 
 * Usable with jQuery or Zepto
-* Support for history
 * usable with [bootstrap](https://github.com/twitter/bootstrap)
 * printable
 
@@ -34,15 +33,14 @@ Options
 
 * `activeClass` - class to be added to the active Tab, default: `'active'`
 * `inactiveClass` - class to be added to an inactive Tab, default: `'inactive'`
-* `useHistory` - use the history, needs hasher and js-signals, default: `true`, if hasher isn't included it is set to `false` regardless of what was set in the options
 * `tabsClickable` - set to `false`, if you don't want the tabs in the tabbar to be clickable
 * `events` - object of form `{ 'change': function(){} }`. Used to set callbacks, that will be executed as soon as the page is loaded
+* ìnitialTab` - The tab that should be selectet at the beginning
 
 Dependencies
 ------------
 
 * [jQuery (1.7)](http://jquery.com/) or [Zepto (0.8)](http://zeptojs.com/)
-* (optional) [hasher](http://github.com/millermedeiros/hasher) (and therefore [js-signals](http://millermedeiros.github.com/js-signals/)) for history support
 
 Simple example
 --------------
@@ -50,7 +48,7 @@ Simple example
 ```html
 <div id="the-id">
 	<div class="content">
-		<h1 class="tab-header"><a href="#tab1">Tab 1</a></h1>
+		<h1 class="tab-header" data-title="optional-tab-title"><a href="#tab1">Tab 1</a></h1>
 		<div id="tab1" class="tab-content">
 			Content 1
 		</div>
