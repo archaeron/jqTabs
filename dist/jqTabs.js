@@ -22,7 +22,7 @@
       this.tabHeaders = getTabHeaders(this.el);
       this.tabContents = getTabContents(this.el);
       this.urlTabHeaders = urlifyTabHeaders(this.tabHeaders);
-      topHeaders = createTopHeaders(this.tabHeaders);
+      topHeaders = createTopHeaders(this.tabHeaders, this.urlTabHeaders);
       this.el.prepend(topHeaders);
       if (this.settings.events != null) {
         _ref = options.events;
@@ -191,8 +191,15 @@
     });
   };
 
-  createTopHeaders = function(tabHeaders) {
+  createTopHeaders = function(tabHeaders, urlTabHeaders) {
     var headerContainer, headerList;
+    tabHeaders.each(function(i, header) {
+      var a;
+      a = $(header).find('a');
+      if (a.length) {
+        return a.attr('href', "#" + urlTabHeaders[i]);
+      }
+    });
     headerContainer = $($.parseHTML('<div class="tab-header-container"></div>'));
     headerList = $($.parseHTML('<ul class="tab-headers tabs"></ul>'));
     return headerList.append(tabHeaders);

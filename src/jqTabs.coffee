@@ -20,7 +20,7 @@ class jqTabs
 		@urlTabHeaders = urlifyTabHeaders @tabHeaders
 
 		# create a new element and add the headers to it
-		topHeaders = createTopHeaders(@tabHeaders)
+		topHeaders = createTopHeaders @tabHeaders, @urlTabHeaders
 
 		# prepend the headers to the main element
 		@el.prepend topHeaders
@@ -189,7 +189,6 @@ class jqTabs
 		else
 			-1
 
-
 	changeHashOnChangeTab: (headers) ->
 		@on 'change', (tabNr) ->
 			location.replace "##{headers[tabNr]}"
@@ -224,7 +223,12 @@ urlifyTabHeaders = (headers) ->
 		else
 			slugify headerElement.text()
 
-createTopHeaders = (tabHeaders) ->
+createTopHeaders = (tabHeaders, urlTabHeaders) ->
+	tabHeaders.each (i, header) ->
+		a = $(header).find 'a'
+		if a.length
+			a.attr 'href', "##{urlTabHeaders[i]}"
+
 	headerContainer = $($.parseHTML '<div class="tab-header-container"></div>')
 	headerList = $($.parseHTML '<ul class="tab-headers tabs"></ul>')
 	headerList.append tabHeaders
