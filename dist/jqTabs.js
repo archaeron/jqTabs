@@ -67,7 +67,6 @@
       if (0 > whereTo || whereTo >= this.tabHeaders.length) {
         return false;
       } else {
-        console.log(this.activeTab);
         leaveTab = this.trigger("leaveTab:" + this.activeTab, this.activeTab) && this.trigger('leaveTab', this.activeTab);
         goOn = leaveTab && this.trigger("beforeChange:" + whereTo, whereTo) && this.trigger('beforeChange', whereTo);
         if (goOn) {
