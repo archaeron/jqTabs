@@ -210,8 +210,8 @@ class jqTabs
 
 
 getTabHeaders = (container) ->
-	headerContainers = container.find('.tab-header').detach()
-	headerContainers.wrap '<li />'
+	container.find('.tab-header').wrap '<li class="tab-header-list"></li>'
+	container.find('.tab-header-list').detach()
 
 getTabContents = (container) ->
 	container.find '.tab-content'

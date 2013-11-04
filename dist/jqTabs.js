@@ -171,9 +171,8 @@
   })();
 
   getTabHeaders = function(container) {
-    var headerContainers;
-    headerContainers = container.find('.tab-header').detach();
-    return headerContainers.wrap('<li />');
+    container.find('.tab-header').wrap('<li class="tab-header-list"></li>');
+    return container.find('.tab-header-list').detach();
   };
 
   getTabContents = function(container) {
