@@ -242,7 +242,7 @@ trim = (str) ->
 		if String.prototype.trim
 			String.prototype.trim.call str
 		else
-			String(str).replace(new RegExp('\^\\s+|\\s+$', 'g'), '')
+			String(str).replace(new RegExp('\\^\\s+|\\s+$', 'g'), '')
 	else
 		''
 

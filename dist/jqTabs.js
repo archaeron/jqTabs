@@ -213,7 +213,7 @@
       if (String.prototype.trim) {
         return String.prototype.trim.call(str);
       } else {
-        return String(str).replace(new RegExp('\^\\s+|\\s+$', 'g'), '');
+        return String(str).replace(new RegExp('\\^\\s+|\\s+$', 'g'), '');
       }
     } else {
       return '';
