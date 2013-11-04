@@ -12,11 +12,15 @@
 				<div id="tab2" class="tab-content">
 					Content 2
 				</div>
-				<h1 class="tab-header"><a href="#tab3">Tab 3</a></h1>
+				<h1 class="tab-header"><a href="#tab3">This tab will not load</a></h1>
 				<div id="tab3" class="tab-content">
-					Content 3
+					You will never see this
 				</div>
-
+				<h1 class="tab-header"><a href="#tab3">You cant leave this tab easily</a></h1>
+				<div id="tab3" class="tab-content">
+					Say "yes" here to leave this Tab
+					<input id="say-yes">
+				</div>
 			</div>
 		</div>
 
@@ -28,12 +32,12 @@
 		<button class="btn" id="next">Next</button>
 
 		<style>
-			.hidden
+			.tab-content.inactive
 			{
 				display: none;
 			}
 
-			.active
+			.tab-header.active a
 			{
 				color: blue;
 			}
@@ -69,6 +73,16 @@
 									{
 										logEvent('beforeChange:2', '3rd tab will not load');
 										return false;
+									},
+								'leaveTab': function(id)
+									{
+										logEvent('leaveTab', 'leaving Tab #' + (id + 1));
+									},
+								'leaveTab:3': function()
+									{
+										logEvent('leaveTab:3', 'only leaving this Tab if you said yes');
+										var inputText = $('#say-yes').val();
+										return inputText === 'yes';
 									}
 							}
 						},

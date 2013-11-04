@@ -69,7 +69,8 @@ class jqTabs
 		if 0 > whereTo or whereTo >= @tabHeaders.length
 			false
 		else
-			goOn = @trigger("beforeChange:#{whereTo}", whereTo) and @trigger('beforeChange', whereTo)
+			leaveTab = @trigger("leaveTab:#{@activeTab}", @activeTab) and @trigger('leaveTab', @activeTab)
+			goOn = leaveTab and @trigger("beforeChange:#{whereTo}", whereTo) and @trigger('beforeChange', whereTo)
 
 			if goOn
 				currentTab = @changeTab whereTo

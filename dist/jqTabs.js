@@ -63,11 +63,13 @@
     };
 
     jqTabs.prototype.seek = function(whereTo) {
-      var currentTab, goOn;
+      var currentTab, goOn, leaveTab;
       if (0 > whereTo || whereTo >= this.tabHeaders.length) {
         return false;
       } else {
-        goOn = this.trigger("beforeChange:" + whereTo, whereTo) && this.trigger('beforeChange', whereTo);
+        console.log(this.activeTab);
+        leaveTab = this.trigger("leaveTab:" + this.activeTab, this.activeTab) && this.trigger('leaveTab', this.activeTab);
+        goOn = leaveTab && this.trigger("beforeChange:" + whereTo, whereTo) && this.trigger('beforeChange', whereTo);
         if (goOn) {
           currentTab = this.changeTab(whereTo);
           this.trigger("change:" + whereTo);

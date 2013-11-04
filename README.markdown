@@ -21,9 +21,11 @@ Methods
 * `jqTabs::previous()` - go to previous tab
 * `jqTabs::on(event, callback)` - add a callback to a tab.
 	* `event` : event in the form of:
-		* `'beforeChange:#{id}'` : before the tab changes to tab #id
+		* `'leaveTab:#{nr}'` : event fires when trying to leave tab #nr
+		* `'leaveTab'` : 'event fires when you try to leave a tab'
+		* `'beforeChange:#{nr}'` : before the tab changes to tab #id
 		* `'beforeChange'` : before jqTabs changes to any tab
-		* `'change:#{id}'` : after the tab changes to tab #id
+		* `'change:#{nr}'` : after the tab changes to tab #id
 		* `'change'` : after jqTabs changes to any tab
 	* `callback` : the callback function, if a `'beforeChange'` callback returns `false`, the tab won't change
 * `jqTabs::off(event, [callback])` - remove callback from tab. if `callback` is omitted, all callbacks will be removed
